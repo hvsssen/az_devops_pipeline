@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Azure MCP DevOps Agent - Documentation</title>
+    <title>Azure MCP DevOps Agent - Complete Documentation</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css" rel="stylesheet">
     <link href="/static/style.css" rel="stylesheet">
@@ -12,12 +12,12 @@
     <nav class="navbar navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="/">
-                <strong>Azure MCP DevOps Agent</strong>
+                <strong>☁️ Azure MCP DevOps Agent</strong>
             </a>
             {% if logged_in %}
-                <span class="badge bg-success">Connected</span>
+                <span class="badge bg-success">✅ Connected</span>
             {% else %}
-                <span class="badge bg-warning">Not Connected</span>
+                <span class="badge bg-warning">⚠️ Not Connected</span>
             {% endif %}
         </div>
     </nav>
@@ -28,53 +28,66 @@
             <div class="col-12">
                 <div class="jumbotron bg-primary text-white p-5 rounded">
                     <h1 class="display-4">Azure MCP DevOps Agent</h1>
-                    <p class="lead">A powerful Model Context Protocol (MCP) server for GitHub integration and Docker deployment automation.</p>
+                    <p class="lead">A comprehensive Model Context Protocol (MCP) server with <strong>GitHub + Docker + Azure</strong> integration and Smart Port Detection.</p>
                     <hr class="my-4">
-                    <p>Streamline your development workflow with automated repository management, Docker builds, and deployment pipelines.</p>
+                    <p>🚀 Complete DevOps Pipeline: GitHub → Docker → Azure with intelligent automation!</p>
                 </div>
             </div>
         </div>
 
-        <!-- Features Section -->
+        <!-- Key Features -->
         <div class="row mt-5">
             <div class="col-12">
-                <h2>🚀 Key Features</h2>
+                <h2>🌟 Complete DevOps Integration</h2>
                 <div class="row mt-3">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="card h-100">
                             <div class="card-body">
                                 <h5 class="card-title">🐙 GitHub Integration</h5>
                                 <p class="card-text">
                                     • OAuth authentication<br>
-                                    • Repository listing & fetching<br>
+                                    • Repository management<br>
                                     • Automated cloning<br>
-                                    • Repository management
+                                    • Branch operations
                                 </p>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="card h-100">
                             <div class="card-body">
                                 <h5 class="card-title">🐳 Docker Deployment</h5>
                                 <p class="card-text">
-                                    • Automated Docker builds<br>
-                                    • Docker Hub integration<br>
-                                    • Image management<br>
-                                    • Push to registries
+                                    • Smart port detection<br>
+                                    • Automated builds<br>
+                                    • Docker Hub push<br>
+                                    • Container management
                                 </p>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">☁️ Azure Cloud</h5>
+                                <p class="card-text">
+                                    • Azure CLI integration<br>
+                                    • VM management<br>
+                                    • Cost analysis<br>
+                                    • Resource monitoring
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
                         <div class="card h-100">
                             <div class="card-body">
                                 <h5 class="card-title">🤖 MCP Protocol</h5>
                                 <p class="card-text">
-                                    • Standard MCP interface<br>
-                                    • Tool-based interactions<br>
-                                    • Claude integration ready<br>
-                                    • Extensible architecture
+                                    • Standard interface<br>
+                                    • Claude integration<br>
+                                    • Tool-based API<br>
+                                    • Extensible design
                                 </p>
                             </div>
                         </div>
@@ -83,56 +96,46 @@
             </div>
         </div>
 
-        <!-- Installation Section -->
+        <!-- Complete DevOps Workflow -->
         <div class="row mt-5">
             <div class="col-12">
-                <h2>📦 Installation</h2>
-                <div class="card">
-                    <div class="card-body">
-                        <h5>Prerequisites</h5>
-                        <ul>
-                            <li>Python 3.8+</li>
-                            <li>Docker installed and running</li>
-                            <li>Git</li>
-                            <li>Docker Hub account (for deployments)</li>
-                        </ul>
-                        
-                        <h5 class="mt-4">Setup Steps</h5>
-                        <ol>
-                            <li><strong>Clone the repository:</strong>
-                                <pre class="language-bash"><code>git clone https://github.com/hvsssen/az_devops_pipeline.git
-cd az_devops_pipeline/azure_mcp_agent_hassen</code></pre>
-                            </li>
-                            
-                            <li><strong>Install dependencies:</strong>
-                                <pre class="language-bash"><code>pip install fastapi uvicorn python-dotenv httpx gitpython fastapi-mcp</code></pre>
-                            </li>
-                            
-                            <li><strong>Create environment file:</strong>
-                                <pre class="language-bash"><code># Create .env file with your Docker Hub credentials
-echo "DOCKER_USERNAME=your_dockerhub_username" > .env
-echo "DOCKER_PASSWORD=your_dockerhub_password" >> .env</code></pre>
-                            </li>
-                            
-                            <li><strong>Run the server:</strong>
-                                <pre class="language-bash"><code>python server.py</code></pre>
-                            </li>
-                        </ol>
+                <div class="alert alert-info">
+                    <h4>🚀 Complete DevOps Workflow</h4>
+                    <p><strong>Your MCP server now provides end-to-end DevOps automation!</strong></p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>📋 Development Flow:</h6>
+                            <ol class="mb-0">
+                                <li>🐙 <strong>GitHub:</strong> List, clone, manage repositories</li>
+                                <li>🔍 <strong>Smart Detection:</strong> Auto-detect ports and configurations</li>
+                                <li>🐳 <strong>Docker:</strong> Build, tag, and push images</li>
+                                <li>☁️ <strong>Azure:</strong> Deploy to cloud infrastructure</li>
+                            </ol>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>📊 Operations & Monitoring:</h6>
+                            <ul class="mb-0">
+                                <li>💰 <strong>Cost Analysis:</strong> Track Azure spending</li>
+                                <li>🖥️ <strong>VM Management:</strong> Monitor virtual machines</li>
+                                <li>📈 <strong>Usage Reports:</strong> Analyze resource consumption</li>
+                                <li>🔧 <strong>Resource Groups:</strong> Organize cloud resources</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- API Endpoints Section -->
+        <!-- API Endpoints -->
         <div class="row mt-5">
             <div class="col-12">
-                <h2>🔗 API Endpoints</h2>
+                <h2>🔗 Complete API Documentation</h2>
                 <div class="accordion" id="apiAccordion">
                     <!-- GitHub Endpoints -->
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="githubHeading">
                             <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#githubCollapse">
-                                GitHub Integration APIs
+                                🐙 GitHub Integration APIs
                             </button>
                         </h2>
                         <div id="githubCollapse" class="accordion-collapse collapse show" data-bs-parent="#apiAccordion">
@@ -160,12 +163,7 @@ echo "DOCKER_PASSWORD=your_dockerhub_password" >> .env</code></pre>
                                             <tr>
                                                 <td><span class="badge bg-primary">GET</span></td>
                                                 <td><code>/clone</code></td>
-                                                <td>Clone a repository</td>
-                                            </tr>
-                                            <tr>
-                                                <td><span class="badge bg-primary">GET</span></td>
-                                                <td><code>/callback</code></td>
-                                                <td>OAuth callback handler</td>
+                                                <td>Clone repository locally</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -174,14 +172,14 @@ echo "DOCKER_PASSWORD=your_dockerhub_password" >> .env</code></pre>
                         </div>
                     </div>
 
-                    <!-- Deployment Endpoints -->
+                    <!-- Docker Endpoints -->
                     <div class="accordion-item">
-                        <h2 class="accordion-header" id="deployHeading">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#deployCollapse">
-                                Deployment APIs
+                        <h2 class="accordion-header" id="dockerHeading">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#dockerCollapse">
+                                🐳 Docker & Container APIs
                             </button>
                         </h2>
-                        <div id="deployCollapse" class="accordion-collapse collapse" data-bs-parent="#apiAccordion">
+                        <div id="dockerCollapse" class="accordion-collapse collapse" data-bs-parent="#apiAccordion">
                             <div class="accordion-body">
                                 <div class="table-responsive">
                                     <table class="table table-striped">
@@ -199,14 +197,70 @@ echo "DOCKER_PASSWORD=your_dockerhub_password" >> .env</code></pre>
                                                 <td>Build and deploy Docker image</td>
                                             </tr>
                                             <tr>
-                                                <td><span class="badge bg-success">POST</span></td>
-                                                <td><code>/web/deploy</code></td>
-                                                <td>Web interface for deployment</td>
+                                                <td><span class="badge bg-primary">GET</span></td>
+                                                <td><code>/run_container</code></td>
+                                                <td>🔥 Run container with smart port detection</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="badge bg-primary">GET</span></td>
+                                                <td><code>/detect_ports</code></td>
+                                                <td>🔥 Analyze repository for exposed ports</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Azure Endpoints -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="azureHeading">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#azureCollapse">
+                                ☁️ Azure Cloud APIs
+                            </button>
+                        </h2>
+                        <div id="azureCollapse" class="accordion-collapse collapse" data-bs-parent="#apiAccordion">
+                            <div class="accordion-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Method</th>
+                                                <th>Endpoint</th>
+                                                <th>Description</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><span class="badge bg-primary">GET</span></td>
+                                                <td><code>/azure/login</code></td>
+                                                <td>🆕 Launch Azure CLI login</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="badge bg-primary">GET</span></td>
+                                                <td><code>/azure/subscriptions</code></td>
+                                                <td>🆕 List Azure subscriptions</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="badge bg-primary">GET</span></td>
+                                                <td><code>/azure/vms</code></td>
+                                                <td>🆕 Get VM usage and cost analysis</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="badge bg-primary">GET</span></td>
+                                                <td><code>/azure/resource-groups</code></td>
+                                                <td>🆕 List Azure resource groups</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="badge bg-primary">GET</span></td>
+                                                <td><code>/azure/vm-details</code></td>
+                                                <td>🆕 Get detailed VM information</td>
                                             </tr>
                                             <tr>
                                                 <td><span class="badge bg-success">POST</span></td>
-                                                <td><code>/web/clone</code></td>
-                                                <td>Web interface for cloning</td>
+                                                <td><code>/azure/command</code></td>
+                                                <td>🆕 Execute Azure CLI commands</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -218,133 +272,127 @@ echo "DOCKER_PASSWORD=your_dockerhub_password" >> .env</code></pre>
             </div>
         </div>
 
-        <!-- MCP Tools Section -->
-        <div class="row mt-5">
-            <div class="col-12">
-                <h2>🛠️ MCP Tools Available</h2>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header bg-info text-white">
-                                <h5>Repository Management</h5>
-                            </div>
-                            <div class="card-body">
-                                <ul class="list-unstyled">
-                                    <li>✅ <code>github_login</code> - Authenticate with GitHub</li>
-                                    <li>✅ <code>fetch_repositories</code> - List user repositories</li>
-                                    <li>✅ <code>clone_repository</code> - Clone repos locally</li>
-                                    <li>✅ <code>github_callback</code> - Handle OAuth flow</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header bg-success text-white">
-                                <h5>Deployment & Docker</h5>
-                            </div>
-                            <div class="card-body">
-                                <ul class="list-unstyled">
-                                    <li>✅ <code>deploy</code> - Build & deploy Docker images</li>
-                                    <li>✅ <code>web_deploy</code> - Web deployment interface</li>
-                                    <li>✅ <code>web_clone</code> - Web cloning interface</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Usage Examples -->
         <div class="row mt-5">
             <div class="col-12">
-                <h2>💡 Usage Examples</h2>
+                <h2>💡 Complete DevOps Workflow Examples</h2>
                 <div class="card">
                     <div class="card-body">
-                        <h5>1. GitHub Authentication & Repository Listing</h5>
-                        <pre class="language-python"><code># Using MCP tools in Claude
-1. Call: github_login_mcp_github_login_get()
-2. Open the provided URL in browser
-3. Complete OAuth flow
-4. Call: get_repositories_github_repos_get()</code></pre>
+                        <h5>1. End-to-End Development & Deployment</h5>
+                        <pre class="language-python"><code># Complete workflow: GitHub → Docker → Azure
+# Step 1: GitHub Authentication & Repository Management
+github_login = github_login_mcp_github_login_get()
+repos = get_repositories_github_repos_get()
+clone_result = clone_repository_clone_get(repo_url="https://github.com/user/webapp")
 
-                        <h5 class="mt-4">2. Clone and Deploy a Repository</h5>
-                        <pre class="language-python"><code># Clone repository
-1. Call: clone_repository_clone_get(repo_url="https://github.com/user/repo")
+# Step 2: Smart Docker Build & Deploy
+port_detection = detect_ports_endpoint(repo_path="repos/webapp") 
+deploy_result = deploy_deploy_post({
+    "repo_full_name": "user/webapp",
+    "tag": "latest",
+    "image_name": "webapp", 
+    "repo_path": "repos/webapp"
+})
 
-# Deploy the cloned repository
-2. Call: deploy_deploy_post({
-    "repo_full_name": "user/repo",
-    "tag": "latest", 
-    "image_name": "my-app",
-    "repo_path": "repos/repo-name"
-})</code></pre>
+# Step 3: Azure Cloud Management
+azure_login = azure_login()
+subscriptions = azure_subscriptions()
+vm_usage = azure_vm_usage()
 
-                        <h5 class="mt-4">3. Direct API Usage</h5>
-                        <pre class="language-bash"><code># Get repositories
-curl -X GET "http://localhost:8000/github/repos"
+# Step 4: Run with Auto-Detection
+container_result = run_docker_container(
+    image="webapp",
+    tag="latest", 
+    repo_path="repos/webapp"
+)</code></pre>
 
-# Clone a repository  
-curl -X GET "http://localhost:8000/clone?repo_url=https://github.com/user/repo"
+                        <h5 class="mt-4">2. Azure Cloud Operations</h5>
+                        <pre class="language-python"><code># Azure resource management and monitoring
+# Authentication
+azure_login_response = azure_login()
 
-# Deploy
-curl -X POST "http://localhost:8000/deploy" \
-  -H "Content-Type: application/json" \
-  -d '{"repo_full_name":"user/repo","tag":"latest","image_name":"app","repo_path":"repos/repo"}'</code></pre>
+# List subscriptions and resources
+subscriptions = azure_subscriptions()
+resource_groups = azure_resource_groups()
+
+# VM management and cost analysis
+vm_usage_data = azure_vm_usage()
+vm_details = azure_vm_details(
+    vm_name="my-vm", 
+    resource_group="my-rg"
+)
+
+# Execute custom Azure CLI commands
+command_result = azure_command_async(command="vm list --output table")</code></pre>
+
+                        <h5 class="mt-4">3. Cost Monitoring & Analysis</h5>
+                        <pre class="language-bash"><code># Get Azure cost and usage data
+curl "http://localhost:8000/azure/vms"
+
+# Response includes:
+{
+  "status": "ok",
+  "vms": [...],           # List of all VMs
+  "total_cost": 125.50,   # Total cost (last 30 days)
+  "currency": "USD",      # Currency
+  "debug": [...]          # Debug information
+}</code></pre>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Configuration -->
+        <!-- Installation -->
         <div class="row mt-5 mb-5">
             <div class="col-12">
-                <h2>⚙️ Configuration</h2>
+                <h2>📦 Installation & Setup</h2>
                 <div class="card">
                     <div class="card-body">
-                        <h5>Environment Variables</h5>
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Variable</th>
-                                        <th>Description</th>
-                                        <th>Required</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td><code>DOCKER_USERNAME</code></td>
-                                        <td>Your Docker Hub username</td>
-                                        <td>Yes (for deployments)</td>
-                                    </tr>
-                                    <tr>
-                                        <td><code>DOCKER_PASSWORD</code></td>
-                                        <td>Your Docker Hub password/token</td>
-                                        <td>Yes (for deployments)</td>
-                                    </tr>
-                                    <tr>
-                                        <td><code>GITHUB_CLIENT_ID</code></td>
-                                        <td>GitHub OAuth app client ID</td>
-                                        <td>Yes (for GitHub integration)</td>
-                                    </tr>
-                                    <tr>
-                                        <td><code>GITHUB_CLIENT_SECRET</code></td>
-                                        <td>GitHub OAuth app client secret</td>
-                                        <td>Yes (for GitHub integration)</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <h5 class="mt-4">Default Ports & Paths</h5>
+                        <h5>Prerequisites</h5>
                         <ul>
-                            <li><strong>Server Port:</strong> 8000</li>
-                            <li><strong>Clone Directory:</strong> <code>./repos/</code></li>
-                            <li><strong>Static Files:</strong> <code>./static/</code></li>
-                            <li><strong>Templates:</strong> <code>./templates/</code></li>
+                            <li>Python 3.8+</li>
+                            <li>Docker installed and running</li>
+                            <li>Azure CLI installed</li>
+                            <li>Git</li>
+                            <li>Docker Hub account</li>
+                            <li>Azure subscription</li>
                         </ul>
+                        
+                        <h5 class="mt-4">Complete Setup</h5>
+                        <pre class="language-bash"><code># 1. Clone the MCP server
+git clone https://github.com/hvsssen/az_devops_pipeline.git
+cd az_devops_pipeline/azure_mcp_agent_hassen
+
+# 2. Install Python dependencies
+pip install fastapi uvicorn python-dotenv httpx gitpython fastapi-mcp
+
+# 3. Install Azure CLI (if not installed)
+# Windows: https://aka.ms/installazurecliwindows
+# macOS: brew install azure-cli
+# Linux: curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+# 4. Configure environment
+echo "DOCKER_USERNAME=your_username" > .env
+echo "DOCKER_PASSWORD=your_password" >> .env
+
+# 5. Run the server
+python server.py
+
+# 6. Access documentation at http://localhost:8000</code></pre>
+
+                        <h5 class="mt-4">🆕 What's New in This Conversion</h5>
+                        <div class="alert alert-success">
+                            <h6>✅ Converted from standalone MCP to integrated utilities:</h6>
+                            <ul class="mb-0">
+                                <li><strong>Modular Design:</strong> Azure functions are now utility methods in <code>azure_utils.py</code></li>
+                                <li><strong>REST API Integration:</strong> Azure endpoints added to main FastAPI server</li>
+                                <li><strong>Pydantic Models:</strong> Type-safe request/response models for Azure operations</li>
+                                <li><strong>Unified Interface:</strong> GitHub + Docker + Azure in one MCP server</li>
+                                <li><strong>Session Management:</strong> Azure authentication persisted across requests</li>
+                                <li><strong>Error Handling:</strong> Comprehensive error handling and logging</li>
+                                <li><strong>Async Support:</strong> Asynchronous Azure CLI command execution</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -354,17 +402,18 @@ curl -X POST "http://localhost:8000/deploy" \
     <footer class="bg-dark text-white mt-5 py-4">
         <div class="container">
             <div class="row">
-                <div class="col-md-6">
-                    <h5>Azure MCP DevOps Agent</h5>
-                    <p>Built with FastAPI and Model Context Protocol</p>
+                <div class="col-md-8">
+                    <h5>☁️ Azure MCP DevOps Agent</h5>
+                    <p>Complete DevOps automation: GitHub + Docker + Azure</p>
+                    <p class="text-muted">Built with FastAPI • Smart Port Detection • Azure Integration • Model Context Protocol</p>
                 </div>
-                <div class="col-md-6 text-end">
+                <div class="col-md-4 text-end">
                     <p>
                         <a href="https://github.com/hvsssen/az_devops_pipeline" class="text-white">
-                            View on GitHub
+                            📁 View on GitHub
                         </a>
                     </p>
-                    <p class="text-muted">Status: {% if logged_in %}Connected{% else %}Not Connected{% endif %}</p>
+                    <p>Status: {% if logged_in %}<span class="text-success">✅ Connected</span>{% else %}<span class="text-warning">⚠️ Not Connected</span>{% endif %}</p>
                 </div>
             </div>
         </div>
