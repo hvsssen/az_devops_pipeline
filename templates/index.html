@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MCP Web UI</title>
+</head>
+<body>
+    <h1>MCP Web Interface</h1>
+
+    {% if message %}
+        <p><strong>{{ message }}</strong></p>
+    {% endif %}
+
+    {% if not logged_in %}
+        <h2>Step 1: Login with GitHub</h2>
+        <a href="/web/login"><button>Login with GitHub</button></a>
+    {% else %}
+        <h2>Step 2: Clone a GitHub Repo</h2>
+        <form action="/web/clone" method="post">
+            <input type="text" name="repo_url" placeholder="Repo URL" required>
+            <button type="submit">Clone</button>
+        </form>
+
+        <h2>Step 3: Deploy to Docker</h2>
+        <form action="/web/deploy" method="post">
+            <input type="text" name="repo_path" placeholder="Local repo path" required>
+            <input type="text" name="image_name" placeholder="Docker image name" required>
+            <input type="text" name="tag" placeholder="Tag" value="latest">
+            <button type="submit">Deploy</button>
+        </form>
+    {% endif %}
+</body>
+</html>

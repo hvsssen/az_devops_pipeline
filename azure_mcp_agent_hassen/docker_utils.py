@@ -48,3 +48,29 @@ def push_image(image_name: str, tag: str = "latest"):
     full_image_name = f"{image_name}:{tag}"
     subprocess.run(["docker", "push", full_image_name], check=True)
     print(f"✅ Pushed Docker image: {full_image_name}")
+
+def run_container(image_name: str, tag: str = "latest", container_name: str = None, ports: dict = None, detach: bool = True):
+    # Ensure image name includes Docker Hub username if not already present
+    if "/" not in image_name:
+        username = os.getenv("DOCKER_USERNAME")
+        if username:
+            image_name = f"{username}/{image_name}"
+
+    full_image_name = f"{image_name}:{tag}"
+
+    cmd = ["docker", "run"]
+
+    if detach:
+        cmd.append("-d")
+
+    if container_name:
+        cmd += ["--name", container_name]
+
+    if ports:
+        for host_port, container_port in ports.items():
+            cmd += ["-p", f"{host_port}:{container_port}"]
+
+    cmd.append(full_image_name)
+
+    subprocess.run(cmd, check=True)
+    print(f"✅ Running container from image: {full_image_name}")

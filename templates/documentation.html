@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azure MCP DevOps Agent - Documentation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css" rel="stylesheet">
+    <link href="/static/style.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <strong>Azure MCP DevOps Agent</strong>
+            </a>
+            {% if logged_in %}
+                <span class="badge bg-success">Connected</span>
+            {% else %}
+                <span class="badge bg-warning">Not Connected</span>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Hero Section -->
+        <div class="row">
+            <div class="col-12">
+                <div class="jumbotron bg-primary text-white p-5 rounded">
+                    <h1 class="display-4">Azure MCP DevOps Agent</h1>
+                    <p class="lead">A powerful Model Context Protocol (MCP) server for GitHub integration and Docker deployment automation.</p>
+                    <hr class="my-4">
+                    <p>Streamline your development workflow with automated repository management, Docker builds, and deployment pipelines.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <h2>🚀 Key Features</h2>
+                <div class="row mt-3">
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">🐙 GitHub Integration</h5>
+                                <p class="card-text">
+                                    • OAuth authentication<br>
+                                    • Repository listing & fetching<br>
+                                    • Automated cloning<br>
+                                    • Repository management
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">🐳 Docker Deployment</h5>
+                                <p class="card-text">
+                                    • Automated Docker builds<br>
+                                    • Docker Hub integration<br>
+                                    • Image management<br>
+                                    • Push to registries
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">🤖 MCP Protocol</h5>
+                                <p class="card-text">
+                                    • Standard MCP interface<br>
+                                    • Tool-based interactions<br>
+                                    • Claude integration ready<br>
+                                    • Extensible architecture
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Installation Section -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <h2>📦 Installation</h2>
+                <div class="card">
+                    <div class="card-body">
+                        <h5>Prerequisites</h5>
+                        <ul>
+                            <li>Python 3.8+</li>
+                            <li>Docker installed and running</li>
+                            <li>Git</li>
+                            <li>Docker Hub account (for deployments)</li>
+                        </ul>
+                        
+                        <h5 class="mt-4">Setup Steps</h5>
+                        <ol>
+                            <li><strong>Clone the repository:</strong>
+                                <pre class="language-bash"><code>git clone https://github.com/hvsssen/az_devops_pipeline.git
+cd az_devops_pipeline/azure_mcp_agent_hassen</code></pre>
+                            </li>
+                            
+                            <li><strong>Install dependencies:</strong>
+                                <pre class="language-bash"><code>pip install fastapi uvicorn python-dotenv httpx gitpython fastapi-mcp</code></pre>
+                            </li>
+                            
+                            <li><strong>Create environment file:</strong>
+                                <pre class="language-bash"><code># Create .env file with your Docker Hub credentials
+echo "DOCKER_USERNAME=your_dockerhub_username" > .env
+echo "DOCKER_PASSWORD=your_dockerhub_password" >> .env</code></pre>
+                            </li>
+                            
+                            <li><strong>Run the server:</strong>
+                                <pre class="language-bash"><code>python server.py</code></pre>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Endpoints Section -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <h2>🔗 API Endpoints</h2>
+                <div class="accordion" id="apiAccordion">
+                    <!-- GitHub Endpoints -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="githubHeading">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#githubCollapse">
+                                GitHub Integration APIs
+                            </button>
+                        </h2>
+                        <div id="githubCollapse" class="accordion-collapse collapse show" data-bs-parent="#apiAccordion">
+                            <div class="accordion-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Method</th>
+                                                <th>Endpoint</th>
+                                                <th>Description</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><span class="badge bg-primary">GET</span></td>
+                                                <td><code>/github/login</code></td>
+                                                <td>Initiate GitHub OAuth login</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="badge bg-primary">GET</span></td>
+                                                <td><code>/github/repos</code></td>
+                                                <td>List user repositories</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="badge bg-primary">GET</span></td>
+                                                <td><code>/clone</code></td>
+                                                <td>Clone a repository</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="badge bg-primary">GET</span></td>
+                                                <td><code>/callback</code></td>
+                                                <td>OAuth callback handler</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Deployment Endpoints -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="deployHeading">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#deployCollapse">
+                                Deployment APIs
+                            </button>
+                        </h2>
+                        <div id="deployCollapse" class="accordion-collapse collapse" data-bs-parent="#apiAccordion">
+                            <div class="accordion-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Method</th>
+                                                <th>Endpoint</th>
+                                                <th>Description</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><span class="badge bg-success">POST</span></td>
+                                                <td><code>/deploy</code></td>
+                                                <td>Build and deploy Docker image</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="badge bg-success">POST</span></td>
+                                                <td><code>/web/deploy</code></td>
+                                                <td>Web interface for deployment</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="badge bg-success">POST</span></td>
+                                                <td><code>/web/clone</code></td>
+                                                <td>Web interface for cloning</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MCP Tools Section -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <h2>🛠️ MCP Tools Available</h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-info text-white">
+                                <h5>Repository Management</h5>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-unstyled">
+                                    <li>✅ <code>github_login</code> - Authenticate with GitHub</li>
+                                    <li>✅ <code>fetch_repositories</code> - List user repositories</li>
+                                    <li>✅ <code>clone_repository</code> - Clone repos locally</li>
+                                    <li>✅ <code>github_callback</code> - Handle OAuth flow</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-success text-white">
+                                <h5>Deployment & Docker</h5>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-unstyled">
+                                    <li>✅ <code>deploy</code> - Build & deploy Docker images</li>
+                                    <li>✅ <code>web_deploy</code> - Web deployment interface</li>
+                                    <li>✅ <code>web_clone</code> - Web cloning interface</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Usage Examples -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <h2>💡 Usage Examples</h2>
+                <div class="card">
+                    <div class="card-body">
+                        <h5>1. GitHub Authentication & Repository Listing</h5>
+                        <pre class="language-python"><code># Using MCP tools in Claude
+1. Call: github_login_mcp_github_login_get()
+2. Open the provided URL in browser
+3. Complete OAuth flow
+4. Call: get_repositories_github_repos_get()</code></pre>
+
+                        <h5 class="mt-4">2. Clone and Deploy a Repository</h5>
+                        <pre class="language-python"><code># Clone repository
+1. Call: clone_repository_clone_get(repo_url="https://github.com/user/repo")
+
+# Deploy the cloned repository
+2. Call: deploy_deploy_post({
+    "repo_full_name": "user/repo",
+    "tag": "latest", 
+    "image_name": "my-app",
+    "repo_path": "repos/repo-name"
+})</code></pre>
+
+                        <h5 class="mt-4">3. Direct API Usage</h5>
+                        <pre class="language-bash"><code># Get repositories
+curl -X GET "http://localhost:8000/github/repos"
+
+# Clone a repository  
+curl -X GET "http://localhost:8000/clone?repo_url=https://github.com/user/repo"
+
+# Deploy
+curl -X POST "http://localhost:8000/deploy" \
+  -H "Content-Type: application/json" \
+  -d '{"repo_full_name":"user/repo","tag":"latest","image_name":"app","repo_path":"repos/repo"}'</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuration -->
+        <div class="row mt-5 mb-5">
+            <div class="col-12">
+                <h2>⚙️ Configuration</h2>
+                <div class="card">
+                    <div class="card-body">
+                        <h5>Environment Variables</h5>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Variable</th>
+                                        <th>Description</th>
+                                        <th>Required</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>DOCKER_USERNAME</code></td>
+                                        <td>Your Docker Hub username</td>
+                                        <td>Yes (for deployments)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>DOCKER_PASSWORD</code></td>
+                                        <td>Your Docker Hub password/token</td>
+                                        <td>Yes (for deployments)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>GITHUB_CLIENT_ID</code></td>
+                                        <td>GitHub OAuth app client ID</td>
+                                        <td>Yes (for GitHub integration)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>GITHUB_CLIENT_SECRET</code></td>
+                                        <td>GitHub OAuth app client secret</td>
+                                        <td>Yes (for GitHub integration)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h5 class="mt-4">Default Ports & Paths</h5>
+                        <ul>
+                            <li><strong>Server Port:</strong> 8000</li>
+                            <li><strong>Clone Directory:</strong> <code>./repos/</code></li>
+                            <li><strong>Static Files:</strong> <code>./static/</code></li>
+                            <li><strong>Templates:</strong> <code>./templates/</code></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white mt-5 py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Azure MCP DevOps Agent</h5>
+                    <p>Built with FastAPI and Model Context Protocol</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <p>
+                        <a href="https://github.com/hvsssen/az_devops_pipeline" class="text-white">
+                            View on GitHub
+                        </a>
+                    </p>
+                    <p class="text-muted">Status: {% if logged_in %}Connected{% else %}Not Connected{% endif %}</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>
