@@ -162,6 +162,100 @@ def clone_repository(clone_request: CloneRequest) -> CloneResult:
         )
 
 
+def push_repository_changes(repo_path: str, commit_message: str = "Add workflow files") -> Dict[str, Any]:
+    """
+    Add all changes and push to repository
+    
+    Args:
+        repo_path: Path to the local repository
+        commit_message: Commit message for the changes
+        
+    Returns:
+        Dict containing status and message
+    """
+    try:
+        # Ensure we're in the repository directory
+        if not os.path.exists(repo_path):
+            return {
+                "status": "error",
+                "message": f"Repository path does not exist: {repo_path}"
+            }
+        
+        if not os.path.exists(os.path.join(repo_path, ".git")):
+            return {
+                "status": "error", 
+                "message": f"No git repository found at: {repo_path}"
+            }
+        
+        # Change to repository directory
+        original_cwd = os.getcwd()
+        os.chdir(repo_path)
+        
+        try:
+            # Add all changes
+            add_result = subprocess.run(
+                ["git", "add", "."],
+                capture_output=True,
+                text=True,
+                check=True
+            )
+            
+            # Check if there are changes to commit
+            status_result = subprocess.run(
+                ["git", "status", "--porcelain"],
+                capture_output=True,
+                text=True,
+                check=True
+            )
+            
+            if not status_result.stdout.strip():
+                return {
+                    "status": "info",
+                    "message": "No changes to commit"
+                }
+            
+            # Commit changes
+            commit_result = subprocess.run(
+                ["git", "commit", "-m", commit_message],
+                capture_output=True,
+                text=True,
+                check=True
+            )
+            
+            # Push changes
+            push_result = subprocess.run(
+                ["git", "push"],
+                capture_output=True,
+                text=True,
+                check=True
+            )
+            
+            return {
+                "status": "success",
+                "message": f"Successfully committed and pushed changes: {commit_message}",
+                "commit_output": commit_result.stdout,
+                "push_output": push_result.stdout
+            }
+            
+        finally:
+            # Always return to original directory
+            os.chdir(original_cwd)
+            
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Git operation failed: {e.stderr}")
+        return {
+            "status": "error",
+            "message": f"Git operation failed: {e.stderr}",
+            "error_details": e.stdout
+        }
+    except Exception as e:
+        logging.error(f"Push repository error: {e}")
+        return {
+            "status": "error",
+            "message": f"Push error: {str(e)}"
+        }
+
+
 async def get_repository_branches(owner: str, repo: str, token: Optional[str] = None) -> List[GitBranch]:
     """Get all branches for a repository"""
     try:

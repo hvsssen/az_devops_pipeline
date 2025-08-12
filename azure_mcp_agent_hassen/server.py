@@ -20,6 +20,7 @@ from .git import (
     initiate_github_login,
     exchange_code_for_token,
     get_all_users,
+    push_repository_changes,
     
     # Repository Services
     fetch_user_repositories,
@@ -37,6 +38,9 @@ from .docker import (
     run_container,
     # Utils
     parse_dockerfile_info,
+    # Port detection utilities
+    detect_project_ports,
+    generate_container_name,
     # Models
     DeployRequest,
     ContainerRunOptions
@@ -64,34 +68,14 @@ from .azure import (
     AzureMetric
 )
 
-
 from .github_actions import (
     # Models
-    GitHubRepository,
-    GitHubBranch,
-    GitHubLanguage,
-    GitHubCommit,
-    PortRecommendation,
-    GitHubRepositoryAnalysis,
-    # API functions
-    get_github_repository_info,
-    get_github_branches,
-    get_github_recent_commits,
-    get_comprehensive_repository_analysis,
-    get_repo_recommended_ports,
-    get_github_languages_detailed,
-    analyze_repository_structure,
-    get_primary_language,
-    # Port analysis
-    get_language_default_ports,
-    get_framework_specific_ports,
-    # Deployment
-    deploy_repository_container,
-    get_container_deployment_preview,
-    # CI/CD
-    generate_github_actions_workflow,
-    create_ci_workflow_for_repo,
-    preview_ci_workflow
+    WorkflowJob,
+    WorkflowConfig,
+    # Services
+    create_deploy_workflow,
+    setup_ci_cd,
+    select_branch
 )
 
 load_dotenv()
@@ -145,6 +129,25 @@ async def web_deploy(request: Request, repo_path: str = Form(...), image_name: s
         message = f"❌ Deployment failed: {str(e)}"
     return templates.TemplateResponse("index.html", {"request": request, "logged_in": True, "message": message})
 
+@app.post("/web/push")
+async def web_push(request: Request, repo_path: str = Form(...), commit_message: str = Form("Add workflow files")):
+    try:
+        # Ensure the path is absolute and in repos directory for security
+        if not os.path.isabs(repo_path):
+            repo_path = os.path.abspath(os.path.join("./repos", repo_path))
+        
+        result = push_repository_changes(repo_path, commit_message)
+        
+        if result["status"] == "success":
+            message = f"✅ Push successful: {result['message']}"
+        elif result["status"] == "info":
+            message = f"ℹ️ {result['message']}"
+        else:
+            message = f"❌ Push failed: {result['message']}"
+    except Exception as e:
+        message = f"❌ Push failed: {str(e)}"
+    return templates.TemplateResponse("index.html", {"request": request, "logged_in": True, "message": message})
+
 # ---------- MCP ----------
 @app.get("/github/repos", response_model=List[Repository])
 async def get_repositories(token: str = Query(None)):
@@ -171,6 +174,37 @@ def clone_repository_endpoint(repo_url: str = Query(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/git/push")
+def push_repository_endpoint(repo_path: str = Query(...), commit_message: str = Query("Add workflow files")):
+    """Push all changes in a repository"""
+    try:
+        # Ensure the path is absolute and in repos directory for security
+        if not os.path.isabs(repo_path):
+            repo_path = os.path.abspath(os.path.join("./repos", repo_path))
+        
+        result = push_repository_changes(repo_path, commit_message)
+        
+        if result["status"] == "success":
+            return {
+                "status": "success",
+                "message": result["message"],
+                "repo_path": repo_path,
+                "commit_message": commit_message,
+                "commit_output": result.get("commit_output", ""),
+                "push_output": result.get("push_output", "")
+            }
+        elif result["status"] == "info":
+            return {
+                "status": "info",
+                "message": result["message"],
+                "repo_path": repo_path
+            }
+        else:
+            raise HTTPException(status_code=400, detail=result["message"])
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Push failed: {str(e)}")
+
 @app.post("/deploy")
 async def deploy(request: DeployRequest):
     try:
@@ -184,20 +218,28 @@ async def deploy(request: DeployRequest):
 def run_docker_container(image: str = Query(...), tag: str = "latest", repo_path: str = Query(None)):
     if repo_path:
         # Use auto-detection with repository context
-        run_container(image, tag, container_name="auto_detected_container")
-        recommended_ports, port_info = get_repo_recommended_ports("") if repo_path else ([], {})
+        port_detection = detect_project_ports(repo_path)
+        container_name = generate_container_name(image, tag)
+        run_container(image, tag, container_name=container_name)
+        
         return {
             "status": "running", 
             "image": f"{image}:{tag}",
-            "ports_detected": recommended_ports,
-            "message": f"Container running with auto-detected ports: {recommended_ports}"
+            "container_name": container_name,
+            "ports_detected": port_detection.detected_ports,
+            "dockerfile_ports": port_detection.dockerfile_ports,
+            "recommended_ports": port_detection.recommended_ports,
+            "config_ports": port_detection.config_ports,
+            "message": f"Container running with auto-detected ports: {port_detection.detected_ports}"
         }
     else:
         # Fallback to default behavior
-        run_container(image, tag, container_name="default_container")
+        container_name = generate_container_name(image, tag)
+        run_container(image, tag, container_name=container_name)
         return {
             "status": "running", 
             "image": f"{image}:{tag}",
+            "container_name": container_name,
             "ports_used": [8000],
             "message": "Container running with default port 8000 (no repo_path provided for auto-detection)"
         }
@@ -205,18 +247,55 @@ def run_docker_container(image: str = Query(...), tag: str = "latest", repo_path
 @app.get("/detect_ports")
 def detect_ports_endpoint(repo_path: str = Query(...)):
     """Endpoint to detect ports from a repository without running container"""
-    recommended_ports, port_info = get_repo_recommended_ports("") if repo_path else ([], {})
-    
-    return {
-        "repo_path": repo_path,
-        "port_detection": port_info,
-        "recommended_ports": recommended_ports,
-        "detection_summary": {
-            "dockerfile_found": bool(port_info.get("dockerfile")),
-            "package_json_found": bool(port_info.get("package_json")), 
-            "total_detected": len(recommended_ports)
+    try:
+        port_detection = detect_project_ports(repo_path)
+        
+        return {
+            "status": "success",
+            "repo_path": repo_path,
+            "port_detection": {
+                "detected_ports": port_detection.detected_ports,
+                "dockerfile_ports": port_detection.dockerfile_ports,
+                "recommended_ports": port_detection.recommended_ports,
+                "config_ports": port_detection.config_ports,
+                "default_ports": port_detection.default_ports
+            },
+            "detection_summary": {
+                "total_detected": len(port_detection.detected_ports),
+                "dockerfile_found": len(port_detection.dockerfile_ports) > 0,
+                "config_files_found": len(port_detection.config_ports) > 0,
+                "has_recommendations": len(port_detection.recommended_ports) > 0
+            },
+            "suggested_container_name": generate_container_name("app", "latest")
         }
-    }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Port detection failed: {str(e)}")
+
+@app.get("/dockerfile/parse")
+def parse_dockerfile_endpoint(repo_path: str = Query(...)):
+    """Parse Dockerfile and extract configuration information"""
+    try:
+        dockerfile_path = os.path.join(repo_path, "Dockerfile")
+        if not os.path.exists(dockerfile_path):
+            raise HTTPException(status_code=404, detail="Dockerfile not found in repository")
+        
+        dockerfile_info = parse_dockerfile_info(dockerfile_path)
+        
+        return {
+            "status": "success",
+            "dockerfile_path": dockerfile_path,
+            "base_image": dockerfile_info.base_image,
+            "exposed_ports": dockerfile_info.exposed_ports,
+            "env_vars": dockerfile_info.env_vars,
+            "build_args": dockerfile_info.build_args,
+            "labels": dockerfile_info.labels,
+            "working_dir": dockerfile_info.working_dir,
+            "entrypoint": dockerfile_info.entrypoint,
+            "cmd": dockerfile_info.cmd
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Dockerfile parsing failed: {str(e)}")
+
 
 # ---------- Azure Integration ----------
 async def azure_login_handler():
@@ -318,220 +397,135 @@ async def azure_command_async(command: str = Query(...)):
     result = await az_command_async(command)
     return {"command": command, "result": result}
 
-# ---------- GitHub Actions & Repository Analysis ----------
-@app.get("/github/repository/{owner}/{repo}", response_model=GitHubRepository)
-async def get_repository_info(owner: str, repo: str):
-    """Get comprehensive GitHub repository information"""
-    repo_full_name = f"{owner}/{repo}"
-    repo_info = get_github_repository_info(repo_full_name)
-    if not repo_info:
-        raise HTTPException(status_code=404, detail=f"Repository {repo_full_name} not found")
-    return repo_info
 
-@app.get("/github/repository/{owner}/{repo}/branches", response_model=List[GitHubBranch])
-async def get_repository_branches(owner: str, repo: str):
-    """Get all branches for a GitHub repository"""
-    repo_full_name = f"{owner}/{repo}"
-    branches = get_github_branches(repo_full_name)
-    return branches
+# ---------- GitHub Actions CI/CD Endpoints ----------
 
-@app.get("/github/repository/{owner}/{repo}/languages", response_model=List[GitHubLanguage])
-async def get_repository_languages(owner: str, repo: str):
-    """Get detailed language information for a GitHub repository"""
-    repo_full_name = f"{owner}/{repo}"
-    languages = get_github_languages_detailed(repo_full_name)
-    return languages
-
-@app.get("/github/repository/{owner}/{repo}/commits", response_model=List[GitHubCommit])
-async def get_repository_commits(owner: str, repo: str, count: int = Query(10, ge=1, le=100)):
-    """Get recent commits for a GitHub repository"""
-    repo_full_name = f"{owner}/{repo}"
-    commits = get_github_recent_commits(repo_full_name, count)
-    return commits
-
-@app.get("/github/repository/{owner}/{repo}/analysis", response_model=GitHubRepositoryAnalysis)
-async def get_repository_analysis(owner: str, repo: str):
-    """Get comprehensive repository analysis including structure and recommendations"""
-    repo_full_name = f"{owner}/{repo}"
-    analysis = get_comprehensive_repository_analysis(repo_full_name)
-    if not analysis:
-        raise HTTPException(status_code=404, detail=f"Analysis failed for repository {repo_full_name}")
-    return analysis
-
-@app.get("/github/repository/{owner}/{repo}/structure")
-async def get_repository_structure(owner: str, repo: str):
-    """Analyze repository structure and technology stack"""
-    repo_full_name = f"{owner}/{repo}"
-    structure = analyze_repository_structure(repo_full_name)
-    return structure
-
-@app.get("/github/repository/{owner}/{repo}/primary-language")
-async def get_repository_primary_language(owner: str, repo: str):
-    """Get the primary programming language of a repository"""
-    repo_full_name = f"{owner}/{repo}"
-    primary_lang = get_primary_language(repo_full_name)
-    if not primary_lang:
-        raise HTTPException(status_code=404, detail=f"Could not determine primary language for {repo_full_name}")
-    return {"repository": repo_full_name, "primary_language": primary_lang}
-
-@app.get("/github/repository/{owner}/{repo}/recommended-ports")
-async def get_repository_recommended_ports(owner: str, repo: str):
-    """Get recommended ports for a repository based on its technology stack"""
-    repo_full_name = f"{owner}/{repo}"
-    ports, details = get_repo_recommended_ports(repo_full_name)
-    return {
-        "repository": repo_full_name,
-        "recommended_ports": ports,
-        "port_analysis": details
-    }
-
-@app.get("/github/repository/{owner}/{repo}/framework-ports")
-async def get_repository_framework_ports(owner: str, repo: str):
-    """Get framework-specific port recommendations"""
-    repo_full_name = f"{owner}/{repo}"
-    framework_ports = get_framework_specific_ports(repo_full_name)
-    return {
-        "repository": repo_full_name,
-        "framework_ports": framework_ports
-    }
-
-@app.get("/language/{language}/default-ports")
-async def get_language_ports(language: str):
-    """Get default ports for a specific programming language"""
-    ports = get_language_default_ports(language)
-    return {
-        "language": language,
-        "default_ports": ports
-    }
-
-# ---------- Smart Deployment Endpoints ----------
-@app.post("/deploy/smart")
-async def smart_deploy_repository(
+@app.get("/github/workflow/create")
+async def create_github_workflow(
     owner: str = Query(...),
     repo: str = Query(...),
-    repo_path: str = Query(...),
-    image_name: str = Query(...),
-    tag: str = Query("latest")
+    branch: str = Query("main"),
+    docker_image: str = Query(None)
 ):
-    """Intelligently deploy a repository container with automatic port detection"""
-    repo_full_name = f"{owner}/{repo}"
     try:
-        result = deploy_repository_container(repo_full_name, repo_path, image_name, tag)
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Smart deployment failed: {str(e)}")
-
-@app.get("/deploy/preview")
-async def get_deployment_preview(
-    owner: str = Query(...),
-    repo: str = Query(...),
-    repo_path: str = Query(...)
-):
-    """Preview deployment configuration for a repository"""
-    repo_full_name = f"{owner}/{repo}"
-    try:
-        preview = get_container_deployment_preview(repo_full_name, repo_path)
-        return preview
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Preview generation failed: {str(e)}")
-
-# ---------- GitHub Actions CI/CD Workflow Generation ----------
-@app.post("/github/workflow/generate")
-async def generate_workflow(
-    owner: str = Query(...),
-    repo: str = Query(...),
-    workflow_name: str = Query("ci"),
-    repo_path: str = Query(None)
-):
-    """Generate GitHub Actions CI/CD workflow for a repository"""
-    repo_full_name = f"{owner}/{repo}"
-    
-    # Use default path if not provided
-    if not repo_path:
-        repo_path = f"repos/{repo}"
-    
-    try:
-        result = generate_github_actions_workflow(repo_full_name, repo_path, workflow_name)
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Workflow generation failed: {str(e)}")
-
-@app.post("/github/workflow/create")
-async def create_workflow(
-    owner: str = Query(...),
-    repo: str = Query(...),
-    local_repo_path: str = Query(None)
-):
-    """Create CI workflow for a repository in repos/{repo_name} folder"""
-    repo_full_name = f"{owner}/{repo}"
-    try:
-        result = create_ci_workflow_for_repo(repo_full_name, local_repo_path)
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"CI workflow creation failed: {str(e)}")
-
-@app.get("/github/workflow/preview")
-async def preview_workflow(
-    owner: str = Query(...),
-    repo: str = Query(...)
-):
-    """Preview GitHub Actions workflow without creating files"""
-    repo_full_name = f"{owner}/{repo}"
-    try:
-        preview = preview_ci_workflow(repo_full_name)
-        if preview.get("status") == "error":
-            raise HTTPException(status_code=500, detail=preview.get("error"))
-        return preview
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Workflow preview failed: {str(e)}")
-
-@app.get("/github/repository/{owner}/{repo}/ci-recommendations")
-async def get_ci_recommendations(owner: str, repo: str):
-    """Get CI/CD recommendations based on repository analysis"""
-    repo_full_name = f"{owner}/{repo}"
-    try:
-        # Get comprehensive analysis
-        analysis = get_comprehensive_repository_analysis(repo_full_name)
-        if not analysis:
-            raise HTTPException(status_code=404, detail=f"Could not analyze repository {repo_full_name}")
+        if not docker_image:
+            docker_image = f"{repo.lower()}:latest"
         
-        # Get additional details
-        ports, port_details = get_repo_recommended_ports(repo_full_name)
-        primary_language = get_primary_language(repo_full_name)
-        structure_info = analyze_repository_structure(repo_full_name)
+        # Create the workflow using your service
+        create_deploy_workflow(branch, repo, docker_image)
+
+        return {
+            "status": "success",
+            "message": f"Workflow created for {owner}/{repo}",
+            "branch": branch,
+            "docker_image": docker_image,
+            "workflow_path": f".github/workflows/deploy.yml"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to create workflow: {str(e)}")
+
+@app.post("/github/cicd/setup")
+async def setup_cicd_pipeline(
+    owner: str = Form(...),
+    repo: str = Form(...),
+    token: str = Form(...)
+):
+    try:
+        # Use your CI/CD manager to setup the pipeline
+        setup_ci_cd(owner, repo, token)
         
-        recommendations = {
-            "repository": repo_full_name,
-            "primary_language": primary_language,
-            "recommended_ports": ports,
-            "testing_framework": "auto-detected",
-            "build_tool": structure_info.get("build_tools", []),
-            "frameworks": structure_info.get("detected_frameworks", []),
-            "deployment_strategy": "docker" if structure_info.get("has_dockerfile") else "platform-specific",
-            "branches_for_ci": [
-                analysis.repository.default_branch,
-                "develop" if any(b.name == "develop" for b in analysis.branches) else None
-            ],
-            "recommended_triggers": [
-                f"push to {analysis.repository.default_branch}",
-                "pull requests",
-                "manual workflow dispatch"
-            ],
-            "security_recommendations": [
-                "Use secrets for Docker credentials",
-                "Enable dependency scanning",
-                "Add SAST (Static Application Security Testing)",
-                "Use least privilege permissions"
+        return {
+            "status": "success",
+            "message": f"CI/CD pipeline setup completed for {owner}/{repo}",
+            "next_steps": [
+                "Check the .github/workflows/deploy.yml file",
+                "Commit and push to trigger the workflow", 
+                "Monitor the Actions tab in your GitHub repository"
             ]
         }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"CI/CD setup failed: {str(e)}")
+
+@app.get("/github/branches/select")
+async def select_repository_branch(
+    owner: str = Query(...),
+    repo: str = Query(...),
+    token: str = Query(...)
+):
+    try:
+        # Get branches using your branch selector
+        selected_branch = select_branch(owner, repo, token)
         
-        # Remove None values
-        recommendations["branches_for_ci"] = [b for b in recommendations["branches_for_ci"] if b]
+        return {
+            "status": "success",
+            "selected_branch": selected_branch,
+            "repository": f"{owner}/{repo}"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Branch selection failed: {str(e)}")
+
+@app.post("/github/webhook/handler")
+async def github_webhook_handler(request: Request):
+   
+    try:
+        payload = await request.json()
+        event_type = request.headers.get("x-github-event")
         
-        return recommendations
+        if event_type in ["push", "pull_request"]:
+            repo_full_name = payload.get("repository", {}).get("full_name")
+            branch = payload.get("ref", "").replace("refs/heads/", "") if event_type == "push" else payload.get("pull_request", {}).get("head", {}).get("ref")
+            
+            if repo_full_name and branch:
+                # Extract owner and repo
+                owner, repo = repo_full_name.split("/")
+                
+                # Clone/reclone the repository
+                repo_url = payload.get("repository", {}).get("clone_url")
+                if repo_url:
+                    clone_request = CloneRequest(repo_url=repo_url)
+                    clone_result = clone_repository(clone_request)
+                    
+                    # Build and push Docker image
+                    docker_image = f"{repo.lower()}:{branch}"
+                    docker_login()
+                    built_image = build_image(clone_result.repo_path, repo.lower(), branch)
+                    push_image(repo.lower(), branch)
+                    
+                    return {
+                        "status": "success",
+                        "action": "rebuilt_and_deployed",
+                        "repository": repo_full_name,
+                        "branch": branch,
+                        "image": docker_image,
+                        "event_type": event_type
+                    }
+        
+        return {
+            "status": "ignored",
+            "message": "Event not handled",
+            "event_type": event_type
+        }
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"CI recommendations failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Webhook handling failed: {str(e)}")
+
+@app.get("/github/workflow/status")
+async def get_workflow_status(
+    owner: str = Query(...),
+    repo: str = Query(...),
+    workflow_id: str = Query(None)
+):
+    
+    try:
+        return {
+            "status": "success",
+            "repository": f"{owner}/{repo}",
+            "workflow_id": workflow_id,
+            "message": "Workflow status endpoint - implement with GitHub API calls",
+            "note": "This endpoint can be enhanced to fetch real workflow status from GitHub API"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get workflow status: {str(e)}")
 
 # ---------- MCP mount ----------
 mcp = FastApiMCP(app)

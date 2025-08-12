@@ -9,6 +9,7 @@ from .repositories import (
     fetch_user_repositories,
     get_repository_info,
     clone_repository,
+    push_repository_changes,
     get_repository_branches,
     get_repository_commits,
     search_repositories
@@ -17,7 +18,8 @@ from .repositories import (
 __all__ = [
     "fetch_user_repositories",
     "get_repository_info",
-    "clone_repository", 
+    "clone_repository",
+    "push_repository_changes", 
     "get_repository_branches",
     "get_repository_commits",
     "search_repositories"

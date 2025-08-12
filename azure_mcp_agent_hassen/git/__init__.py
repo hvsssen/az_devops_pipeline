@@ -44,6 +44,7 @@ from .services import (
     fetch_user_repositories,
     get_repository_info,
     clone_repository,
+    push_repository_changes,
     get_repository_branches,
     get_repository_commits,
     search_repositories
@@ -88,6 +89,7 @@ __all__ = [
     "fetch_user_repositories",
     "get_repository_info",
     "clone_repository",
+    "push_repository_changes",
     "get_repository_branches",
     "get_repository_commits",
     "search_repositories",
