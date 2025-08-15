@@ -76,7 +76,7 @@ async def exchange_code_for_token(code: str) -> AuthToken:
             )
             response.raise_for_status()
             data = response.json()
-            
+            print("data:", data)
             access_token = data.get("access_token")
             if not access_token:
                 raise HTTPException(status_code=400, detail="Failed to obtain access token")

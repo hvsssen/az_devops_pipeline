@@ -3,7 +3,7 @@ __pycache__/
 .env
 repos/
 
-# Azure authentication data - NEVER commit this!
+# Azure authentication data
 azure_auth_data.json
 azure_auth_*.json
 *auth_data.json

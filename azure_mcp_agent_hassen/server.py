@@ -7,9 +7,10 @@ import webbrowser
 from typing import List
 from dotenv import load_dotenv
 import os
+from fastapi import Body
 
 # Import utils - Clean modular structure  
-from .git import (
+from azure_mcp_agent_hassen.CI.git import (
     # Core Models (only import ones that definitely exist)
     Repository,
     LoginResponse,
@@ -30,7 +31,7 @@ from .git import (
     # may require the git package models to be properly configured
 )
 
-from .docker import (
+from azure_mcp_agent_hassen.CI.docker import (
     # Core operations
     docker_login, 
     build_image, 
@@ -68,7 +69,7 @@ from .azure import (
     AzureMetric
 )
 
-from .github_actions import (
+from azure_mcp_agent_hassen.CI.github_actions import (
     # Models
     WorkflowJob,
     WorkflowConfig,
@@ -78,6 +79,16 @@ from .github_actions import (
     select_branch
 )
 
+from azure_mcp_agent_hassen.CD.terraform import (
+    TerraformConfig,
+    TerraformStatus, 
+    TerraformGenerateRequest,
+    write_tf_file,
+    init,
+    plan,
+    apply,
+    destroy
+)
 load_dotenv()
 users = get_all_users()
 
@@ -526,6 +537,56 @@ async def get_workflow_status(
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get workflow status: {str(e)}")
+
+# ---------- TERRAFORM ----------
+
+
+
+# Track Terraform initialization status per repo_path
+terraform_init_status = {}
+
+@app.get("/terraform/init")
+def terraform_init(repo_path: str = Query(...)):
+    """Initialize Terraform in the given repo path."""
+    result = init(repo_path)
+    # Mark as initialized if successful
+    if result.get("status") == "success" or "initialized" in str(result).lower():
+        terraform_init_status[repo_path] = True
+    return result
+
+@app.get("/terraform/plan")
+def terraform_plan(repo_path: str = Query(...)):
+    """Show Terraform plan for the given repo path."""
+    if not terraform_init_status.get(repo_path):
+        return {"status": "error", "message": "Terraform not initialized. Please run /terraform/init first."}
+    return plan(repo_path)
+
+@app.get("/terraform/apply")
+def terraform_apply(repo_path: str = Query(...), auto_approve: bool = True):
+    """Apply Terraform changes in the given repo path."""
+    if not terraform_init_status.get(repo_path):
+        return {"status": "error", "message": "Terraform not initialized. Please run /terraform/init first."}
+    return apply(repo_path, auto_approve)
+
+@app.get("/terraform/destroy")
+def terraform_destroy(repo_path: str = Query(...), auto_approve: bool = True):
+    """Destroy Terraform-managed resources in the given repo path."""
+    if not terraform_init_status.get(repo_path):
+        return {"status": "error", "message": "Terraform not initialized. Please run /terraform/init first."}
+    return destroy(repo_path, auto_approve)
+
+
+
+@app.post("/terraform/generate")
+async def terraform_generate_main_tf(request: TerraformGenerateRequest):
+    """Generate a main.tf file in the given repo_path using the provided config."""
+    try:
+        tf_path = write_tf_file(request.repo_path, request.config)
+        terraform_init_status[request.repo_path] = False
+        return {"status": "success", "main_tf_path": tf_path}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
 
 # ---------- MCP mount ----------
 mcp = FastApiMCP(app)
