@@ -548,32 +548,47 @@ terraform_init_status = {}
 @app.get("/terraform/init")
 def terraform_init(repo_path: str = Query(...)):
     """Initialize Terraform in the given repo path."""
-    result = init(repo_path)
-    # Mark as initialized if successful
-    if result.get("status") == "success" or "initialized" in str(result).lower():
-        terraform_init_status[repo_path] = True
-    return result
+    try:
+        result = init(repo_path)
+        # Mark as initialized if successful
+        if result.status == "success":
+            terraform_init_status[repo_path] = True
+        return result.__dict__ if hasattr(result, '__dict__') else result
+    except Exception as e:
+        return {"status": "error", "message": f"Error initializing Terraform: {str(e)}"}
 
 @app.get("/terraform/plan")
 def terraform_plan(repo_path: str = Query(...)):
     """Show Terraform plan for the given repo path."""
-    if not terraform_init_status.get(repo_path):
-        return {"status": "error", "message": "Terraform not initialized. Please run /terraform/init first."}
-    return plan(repo_path)
+    try:
+        if not terraform_init_status.get(repo_path):
+            return {"status": "error", "message": "Terraform not initialized. Please run /terraform/init first."}
+        result = plan(repo_path)
+        return result.__dict__ if hasattr(result, '__dict__') else result
+    except Exception as e:
+        return {"status": "error", "message": f"Error running Terraform plan: {str(e)}"}
 
 @app.get("/terraform/apply")
 def terraform_apply(repo_path: str = Query(...), auto_approve: bool = True):
     """Apply Terraform changes in the given repo path."""
-    if not terraform_init_status.get(repo_path):
-        return {"status": "error", "message": "Terraform not initialized. Please run /terraform/init first."}
-    return apply(repo_path, auto_approve)
+    try:
+        if not terraform_init_status.get(repo_path):
+            return {"status": "error", "message": "Terraform not initialized. Please run /terraform/init first."}
+        result = apply(repo_path, auto_approve)
+        return result.__dict__ if hasattr(result, '__dict__') else result
+    except Exception as e:
+        return {"status": "error", "message": f"Error applying Terraform: {str(e)}"}
 
 @app.get("/terraform/destroy")
 def terraform_destroy(repo_path: str = Query(...), auto_approve: bool = True):
     """Destroy Terraform-managed resources in the given repo path."""
-    if not terraform_init_status.get(repo_path):
-        return {"status": "error", "message": "Terraform not initialized. Please run /terraform/init first."}
-    return destroy(repo_path, auto_approve)
+    try:
+        if not terraform_init_status.get(repo_path):
+            return {"status": "error", "message": "Terraform not initialized. Please run /terraform/init first."}
+        result = destroy(repo_path, auto_approve)
+        return result.__dict__ if hasattr(result, '__dict__') else result
+    except Exception as e:
+        return {"status": "error", "message": f"Error destroying Terraform resources: {str(e)}"}
 
 
 
@@ -581,11 +596,28 @@ def terraform_destroy(repo_path: str = Query(...), auto_approve: bool = True):
 async def terraform_generate_main_tf(request: TerraformGenerateRequest):
     """Generate a main.tf file in the given repo_path using the provided config."""
     try:
-        tf_path = write_tf_file(request.repo_path, request.config)
+        # Ensure repo_path exists and is accessible
+        import os
+        repo_path = os.path.abspath(request.repo_path)
+        
+        # Create directory if it doesn't exist
+        if not os.path.exists(repo_path):
+            os.makedirs(repo_path, exist_ok=True)
+            
+        # Test write permissions
+        test_file = os.path.join(repo_path, 'test_write.txt')
+        try:
+            with open(test_file, 'w') as f:
+                f.write("test")
+            os.remove(test_file)
+        except PermissionError as pe:
+            return {"status": "error", "message": f"Permission denied writing to {repo_path}: {str(pe)}"}
+        
+        tf_path = write_tf_file(repo_path, request.config, request.use_remote_backend)
         terraform_init_status[request.repo_path] = False
         return {"status": "success", "main_tf_path": tf_path}
     except Exception as e:
-        return {"status": "error", "message": str(e)}
+        return {"status": "error", "message": f"Error generating Terraform files: {str(e)}"}
 
 
 # ---------- MCP mount ----------

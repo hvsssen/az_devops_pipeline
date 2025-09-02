@@ -24,3 +24,4 @@ class TerraformStatus(BaseModel):
 class TerraformGenerateRequest(BaseModel):
     repo_path: str
     config: TerraformConfig
+    use_remote_backend: bool = True  # Default to remote backend for production
