@@ -89,8 +89,19 @@ from azure_mcp_agent_hassen.CD.terraform import (
     apply,
     destroy
 )
+
+# Import new Azure deployment services
+from azure_mcp_agent_hassen.azure.services.acr import ACRService
+from azure_mcp_agent_hassen.azure.services.helm import HelmService  
+from azure_mcp_agent_hassen.azure.services.deployment import AzureDeploymentService
+
 load_dotenv()
 users = get_all_users()
+
+# Initialize services
+acr_service = ACRService()
+helm_service = HelmService()
+deployment_service = AzureDeploymentService()
 
 app = FastAPI()
 
@@ -104,10 +115,397 @@ async def documentation_home(request: Request):
     logged_in = len(users) > 0
     return templates.TemplateResponse("documentation.html", {"request": request, "logged_in": logged_in})
 
+@app.get("/workflow/order")
+async def get_workflow_order():
+    """
+    🚀 Complete DevOps Workflow Order Guide
+    
+    This endpoint provides the correct order of operations for using the MCP DevOps Agent.
+    Follow this sequence for successful end-to-end automation.
+    """
+    return {
+        "workflow_title": "🚀 Azure MCP DevOps Agent - Complete Workflow Order",
+        "description": "Follow this exact sequence for successful end-to-end DevOps automation",
+        "prerequisites": {
+            "required_tools": [
+                "Azure CLI installed and accessible",
+                "Docker installed and running", 
+                "Terraform CLI installed",
+                "Git configured",
+                "Azure subscription with appropriate permissions"
+            ],
+            "required_authentication": [
+                "Azure CLI login completed",
+                "GitHub OAuth token (for private repos)",
+                "Docker Hub credentials (for image pushing)"
+            ]
+        },
+        "workflow_steps": [
+            {
+                "step": 1,
+                "category": "🔐 Prerequisites & Authentication",
+                "endpoint": "/azure/login",
+                "method": "GET",
+                "description": "Launch Azure CLI login process",
+                "required": True,
+                "dependencies": [],
+                "expected_result": "Azure authentication completed",
+                "next_steps": ["Verify with /azure/subscriptions"]
+            },
+            {
+                "step": 2,
+                "category": "🔐 Prerequisites & Authentication", 
+                "endpoint": "/azure/subscriptions",
+                "method": "GET",
+                "description": "Verify Azure access and list available subscriptions",
+                "required": True,
+                "dependencies": ["Step 1: Azure login"],
+                "expected_result": "List of accessible Azure subscriptions",
+                "next_steps": ["Proceed to GitHub operations"]
+            },
+            {
+                "step": 3,
+                "category": "🐙 GitHub Operations",
+                "endpoint": "/github/login",
+                "method": "GET", 
+                "description": "Initiate GitHub OAuth authentication",
+                "required": False,
+                "dependencies": [],
+                "expected_result": "GitHub OAuth URL for authentication",
+                "next_steps": ["Complete OAuth in browser, then clone repository"]
+            },
+            {
+                "step": 4,
+                "category": "🐙 GitHub Operations",
+                "endpoint": "/clone",
+                "method": "GET",
+                "parameters": {"repo_url": "https://github.com/user/repo"},
+                "description": "Clone repository for local development",
+                "required": True,
+                "dependencies": [],
+                "expected_result": "Repository cloned to ./repos/repo-name",
+                "next_steps": ["Analyze repository structure"]
+            },
+            {
+                "step": 5,
+                "category": "🔍 Repository Analysis",
+                "endpoint": "/detect_ports", 
+                "method": "GET",
+                "parameters": {"repo_path": "./repos/repo-name"},
+                "description": "Analyze repository for exposed ports and configurations",
+                "required": True,
+                "dependencies": ["Step 4: Repository cloned"],
+                "expected_result": "Detected ports and container configuration",
+                "next_steps": ["Parse Dockerfile if exists"]
+            },
+            {
+                "step": 6,
+                "category": "🔍 Repository Analysis",
+                "endpoint": "/dockerfile/parse",
+                "method": "GET", 
+                "parameters": {"repo_path": "./repos/repo-name"},
+                "description": "Parse Dockerfile and extract build configuration",
+                "required": False,
+                "dependencies": ["Step 5: Port detection completed"],
+                "expected_result": "Dockerfile configuration details",
+                "next_steps": ["Proceed to Docker build and deploy"]
+            },
+            {
+                "step": 7,
+                "category": "🐳 Docker Operations",
+                "endpoint": "/deploy",
+                "method": "POST",
+                "parameters": {
+                    "repo_full_name": "user/repo",
+                    "image_name": "app-name", 
+                    "tag": "latest",
+                    "repo_path": "./repos/repo-name"
+                },
+                "description": "Build Docker image from repository",
+                "required": True,
+                "dependencies": ["Step 4: Repository cloned", "Step 5: Port detection"],
+                "expected_result": "Docker image built successfully",
+                "next_steps": ["Test container locally or proceed to infrastructure"]
+            },
+            {
+                "step": 8,
+                "category": "🐳 Docker Operations (Optional)",
+                "endpoint": "/run_container",
+                "method": "GET",
+                "parameters": {
+                    "image": "app-name",
+                    "tag": "latest",
+                    "repo_path": "./repos/repo-name"
+                },
+                "description": "Run container locally for testing",
+                "required": False,
+                "dependencies": ["Step 7: Docker image built"],
+                "expected_result": "Container running locally with detected ports",
+                "next_steps": ["Stop container and proceed to infrastructure"]
+            },
+            {
+                "step": 9,
+                "category": "🏗️ Infrastructure as Code",
+                "endpoint": "/terraform/generate",
+                "method": "POST",
+                "parameters": {
+                    "config": {
+                        "user_id": "unique_user_id",
+                        "cluster_name": "production-aks",
+                        "region": "eastus",
+                        "node_count": 3,
+                        "vm_size": "Standard_DS2_v2",
+                        "auto_scaling": True,
+                        "min_nodes": 1,
+                        "max_nodes": 5,
+                        "enable_monitoring": True,
+                        "private_cluster": False,
+                        "dns_domain": "myapp.local",
+                        "enable_oidc": True,
+                        "tags": {"environment": "production", "project": "webapp"}
+                    },
+                    "repo_path": "./repos/repo-name",
+                    "use_remote_backend": True
+                },
+                "description": "Generate Terraform configuration for AKS cluster",
+                "required": True,
+                "dependencies": ["Step 1: Azure authentication"],
+                "expected_result": "main.tf and backend.tf files created",
+                "next_steps": ["Initialize Terraform"]
+            },
+            {
+                "step": 10,
+                "category": "🏗️ Infrastructure as Code",
+                "endpoint": "/terraform/init",
+                "method": "GET",
+                "parameters": {"repo_path": "./repos/repo-name"},
+                "description": "Initialize Terraform with Azure backend",
+                "required": True,
+                "dependencies": ["Step 9: Terraform files generated", "Step 1: Azure authentication"],
+                "expected_result": "Terraform initialized with Azure storage backend",
+                "next_steps": ["Plan infrastructure changes"]
+            },
+            {
+                "step": 11,
+                "category": "🏗️ Infrastructure as Code",
+                "endpoint": "/terraform/plan",
+                "method": "GET",
+                "parameters": {"repo_path": "./repos/repo-name"},
+                "description": "Show Terraform execution plan",
+                "required": True,
+                "dependencies": ["Step 10: Terraform initialized"],
+                "expected_result": "Detailed plan of infrastructure changes",
+                "next_steps": ["Review plan, then apply if correct"]
+            },
+            {
+                "step": 12,
+                "category": "🏗️ Infrastructure as Code (CRITICAL)",
+                "endpoint": "/terraform/apply",
+                "method": "GET",
+                "parameters": {"repo_path": "./repos/repo-name", "auto_approve": True},
+                "description": "Apply Terraform changes - CREATES REAL AZURE RESOURCES",
+                "required": False,
+                "dependencies": ["Step 11: Plan reviewed and approved"],
+                "expected_result": "AKS cluster and associated resources created in Azure",
+                "next_steps": ["Monitor deployment, configure kubectl"],
+                "warning": "⚠️ This creates billable Azure resources. Ensure plan is correct before applying."
+            },
+            {
+                "step": 13,
+                "category": "☁️ Azure Monitoring",
+                "endpoint": "/azure/vms",
+                "method": "GET",
+                "description": "Monitor Azure resource usage and costs",
+                "required": False,
+                "dependencies": ["Step 12: Infrastructure deployed"],
+                "expected_result": "Cost analysis and resource utilization data",
+                "next_steps": ["Regular monitoring and optimization"]
+            },
+            {
+                "step": 14,
+                "category": "🧹 Cleanup (When needed)",
+                "endpoint": "/terraform/destroy",
+                "method": "GET",
+                "parameters": {"repo_path": "./repos/repo-name", "auto_approve": True},
+                "description": "Destroy all Terraform-managed resources",
+                "required": False,
+                "dependencies": ["Infrastructure no longer needed"],
+                "expected_result": "All Azure resources destroyed, costs stopped",
+                "next_steps": ["Verify all resources are cleaned up"],
+                "warning": "⚠️ This permanently deletes all infrastructure. Ensure data is backed up."
+            }
+        ],
+        "common_error_recovery": {
+            "terraform_init_backend_changed": {
+                "error": "Backend configuration changed",
+                "solution": "Delete .terraform directory and backend.tf, regenerate with /terraform/generate, then init again"
+            },
+            "azure_auth_expired": {
+                "error": "Azure authentication expired",
+                "solution": "Run /azure/login again to refresh authentication"
+            },
+            "docker_build_failed": {
+                "error": "Docker build failed",
+                "solution": "Check Dockerfile syntax, ensure all dependencies are available"
+            },
+            "terraform_state_locked": {
+                "error": "Terraform state is locked",
+                "solution": "Wait for other operations to complete or force unlock if necessary"
+            }
+        },
+        "best_practices": [
+            "Always run /azure/login before any Azure operations",
+            "Test Docker builds locally before infrastructure deployment",
+            "Review Terraform plans carefully before applying",
+            "Use unique user_id and cluster names to avoid conflicts",
+            "Monitor costs regularly with /azure/vms",
+            "Clean up resources when not needed to avoid unnecessary costs",
+            "Keep Terraform state backed up in Azure Storage",
+            "Use meaningful tags for resource organization"
+        ],
+        "cost_warnings": [
+            "⚠️ AKS clusters incur ongoing costs even when idle",
+            "⚠️ VM sizes like Standard_DS2_v2 have different pricing",
+            "⚠️ Auto-scaling can increase costs during high load",
+            "⚠️ Monitoring and Log Analytics workspace have separate costs",
+            "⚠️ Always destroy test resources when finished"
+        ]
+    }
+
 @app.get("/web/login")
 async def web_github_login():
     url = get_github_login_url()
     return RedirectResponse(url)
+
+@app.get("/workflow/validate")
+async def validate_workflow_prerequisites():
+    """
+    🔍 Validate Workflow Prerequisites
+    
+    Checks if all required tools and authentication are available
+    before starting the workflow.
+    """
+    validation_results = {
+        "overall_status": "checking",
+        "ready_for_workflow": False,
+        "checks": {},
+        "missing_requirements": [],
+        "next_steps": []
+    }
+    
+    try:
+        # Check Azure CLI
+        import subprocess
+        try:
+            result = subprocess.run(["az", "account", "show"], capture_output=True, text=True, timeout=10)
+            if result.returncode == 0:
+                validation_results["checks"]["azure_cli"] = {
+                    "status": "✅ Ready",
+                    "details": "Azure CLI authenticated"
+                }
+            else:
+                validation_results["checks"]["azure_cli"] = {
+                    "status": "❌ Not Authenticated",
+                    "details": "Run /azure/login first"
+                }
+                validation_results["missing_requirements"].append("Azure authentication")
+        except Exception as e:
+            validation_results["checks"]["azure_cli"] = {
+                "status": "❌ Not Available",
+                "details": f"Azure CLI not found: {str(e)}"
+            }
+            validation_results["missing_requirements"].append("Azure CLI installation")
+        
+        # Check Docker
+        try:
+            result = subprocess.run(["docker", "version"], capture_output=True, text=True, timeout=10)
+            if result.returncode == 0:
+                validation_results["checks"]["docker"] = {
+                    "status": "✅ Ready",
+                    "details": "Docker is running"
+                }
+            else:
+                validation_results["checks"]["docker"] = {
+                    "status": "❌ Not Running",
+                    "details": "Docker daemon not accessible"
+                }
+                validation_results["missing_requirements"].append("Docker daemon")
+        except Exception as e:
+            validation_results["checks"]["docker"] = {
+                "status": "❌ Not Available", 
+                "details": f"Docker not found: {str(e)}"
+            }
+            validation_results["missing_requirements"].append("Docker installation")
+        
+        # Check Terraform
+        try:
+            result = subprocess.run(["terraform", "version"], capture_output=True, text=True, timeout=10)
+            if result.returncode == 0:
+                validation_results["checks"]["terraform"] = {
+                    "status": "✅ Ready",
+                    "details": "Terraform CLI available"
+                }
+            else:
+                validation_results["checks"]["terraform"] = {
+                    "status": "❌ Error",
+                    "details": "Terraform command failed"
+                }
+                validation_results["missing_requirements"].append("Terraform CLI")
+        except Exception as e:
+            validation_results["checks"]["terraform"] = {
+                "status": "❌ Not Available",
+                "details": f"Terraform not found: {str(e)}"
+            }
+            validation_results["missing_requirements"].append("Terraform installation")
+        
+        # Check Git
+        try:
+            result = subprocess.run(["git", "version"], capture_output=True, text=True, timeout=10)
+            if result.returncode == 0:
+                validation_results["checks"]["git"] = {
+                    "status": "✅ Ready",
+                    "details": "Git is available"
+                }
+            else:
+                validation_results["checks"]["git"] = {
+                    "status": "❌ Error",
+                    "details": "Git command failed"
+                }
+                validation_results["missing_requirements"].append("Git")
+        except Exception as e:
+            validation_results["checks"]["git"] = {
+                "status": "❌ Not Available",
+                "details": f"Git not found: {str(e)}"
+            }
+            validation_results["missing_requirements"].append("Git installation")
+        
+        # Determine overall status
+        if len(validation_results["missing_requirements"]) == 0:
+            validation_results["overall_status"] = "✅ Ready"
+            validation_results["ready_for_workflow"] = True
+            validation_results["next_steps"] = [
+                "All prerequisites satisfied!",
+                "Start with Step 1: /azure/login (if not already authenticated)",
+                "Follow the complete workflow order from /workflow/order"
+            ]
+        else:
+            validation_results["overall_status"] = "❌ Not Ready"
+            validation_results["ready_for_workflow"] = False
+            validation_results["next_steps"] = [
+                f"Install missing requirements: {', '.join(validation_results['missing_requirements'])}",
+                "Re-run /workflow/validate to check again",
+                "Once all checks pass, follow /workflow/order"
+            ]
+        
+        return validation_results
+        
+    except Exception as e:
+        return {
+            "overall_status": "❌ Validation Failed",
+            "ready_for_workflow": False,
+            "error": str(e),
+            "next_steps": ["Check system configuration and try again"]
+        }
 
 @app.get("/callback")
 async def github_callback(code: str = Query(...)):
@@ -416,22 +814,39 @@ async def create_github_workflow(
     owner: str = Query(...),
     repo: str = Query(...),
     branch: str = Query("main"),
-    docker_image: str = Query(None)
+    docker_image: str = Query(None),
+    registry_type: str = Query("dockerhub", description="Registry type: 'dockerhub' or 'acr'"),
+    acr_name: str = Query(None, description="ACR name (required if registry_type is 'acr')")
 ):
     try:
         if not docker_image:
             docker_image = f"{repo.lower()}:latest"
         
+        # Validate ACR parameters
+        if registry_type.lower() == "acr" and not acr_name:
+            raise HTTPException(status_code=400, detail="acr_name is required when registry_type is 'acr'")
+        
         # Create the workflow using your service
-        create_deploy_workflow(branch, repo, docker_image)
+        create_deploy_workflow(branch, repo, docker_image, registry_type, acr_name)
 
-        return {
+        response = {
             "status": "success",
             "message": f"Workflow created for {owner}/{repo}",
             "branch": branch,
             "docker_image": docker_image,
+            "registry_type": registry_type,
             "workflow_path": f".github/workflows/deploy.yml"
         }
+        
+        if registry_type.lower() == "acr":
+            response["acr_name"] = acr_name
+            response["image_url"] = f"{acr_name}.azurecr.io/{docker_image}"
+            response["secrets_needed"] = ["ACR_USERNAME", "ACR_PASSWORD"]
+        else:
+            response["image_url"] = f"docker.io/[username]/{docker_image}"
+            response["secrets_needed"] = ["DOCKER_USERNAME", "DOCKER_PASSWORD"]
+        
+        return response
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to create workflow: {str(e)}")
 
@@ -618,6 +1033,251 @@ async def terraform_generate_main_tf(request: TerraformGenerateRequest):
         return {"status": "success", "main_tf_path": tf_path}
     except Exception as e:
         return {"status": "error", "message": f"Error generating Terraform files: {str(e)}"}
+
+
+# ---------- Azure Container Registry (ACR) Endpoints ----------
+
+@app.post("/acr/create")
+async def create_acr_registry(
+    name: str = Body(...),
+    resource_group: str = Body(...),
+    location: str = Body(default="eastus")
+):
+    """Create Azure Container Registry"""
+    return await acr_service.create_acr(name, resource_group, location)
+
+@app.get("/acr/login")
+async def login_to_acr(name: str = Query(...)):
+    """Login to Azure Container Registry"""
+    return await acr_service.login_to_acr(name)
+
+@app.post("/acr/push")
+async def push_to_acr(
+    local_image: str = Body(...),
+    acr_name: str = Body(...),
+    repo_name: str = Body(...),
+    tag: str = Body(default="latest")
+):
+    """Push Docker image to ACR"""
+    return await acr_service.push_image_to_acr(local_image, acr_name, repo_name, tag)
+
+@app.get("/acr/repositories")
+async def list_acr_repositories(acr_name: str = Query(...)):
+    """List repositories in ACR"""
+    return await acr_service.list_acr_repositories(acr_name)
+
+@app.post("/acr/attach-aks")
+async def attach_acr_to_aks(
+    acr_name: str = Body(...),
+    aks_name: str = Body(...),
+    resource_group: str = Body(...)
+):
+    """Attach ACR to AKS cluster"""
+    return await acr_service.attach_acr_to_aks(acr_name, aks_name, resource_group)
+
+# ---------- Helm Charts Endpoints ----------
+
+@app.post("/helm/create-chart")
+async def create_helm_chart(
+    chart_name: str = Body(...),
+    app_name: str = Body(...),
+    image_repository: str = Body(...),
+    image_tag: str = Body(default="latest"),
+    port: int = Body(default=80),
+    namespace: str = Body(default="default")
+):
+    """Create Helm chart for application"""
+    # Use the exact repos/mcp-test-app directory as the base path
+    repo_base_path = os.path.abspath(os.path.join(os.getcwd(), "repos", "mcp-test-app"))
+    helm_service_with_path = HelmService(base_path=repo_base_path)
+    return await helm_service_with_path.create_helm_chart(
+        chart_name, app_name, image_repository, image_tag, port, namespace
+    )
+
+@app.post("/helm/install")
+async def install_helm_chart(
+    chart_name: str = Body(...),
+    release_name: str = Body(...),
+    namespace: str = Body(default="default"),
+    values_override: dict = Body(default=None)
+):
+    """Install Helm chart to Kubernetes"""
+    # Use the exact repos/mcp-test-app directory as the base path
+    repo_base_path = os.path.abspath(os.path.join(os.getcwd(), "repos", "mcp-test-app"))
+    helm_service_with_path = HelmService(base_path=repo_base_path)
+    return await helm_service_with_path.install_helm_chart(
+        chart_name, release_name, namespace, values_override
+    )
+
+@app.post("/helm/upgrade")
+async def upgrade_helm_release(
+    release_name: str = Body(...),
+    chart_name: str = Body(...),
+    namespace: str = Body(default="default"),
+    values_override: dict = Body(default=None)
+):
+    """Upgrade existing Helm release"""
+    return await helm_service.upgrade_helm_release(
+        release_name, chart_name, namespace, values_override
+    )
+
+@app.delete("/helm/uninstall")
+async def uninstall_helm_release(
+    release_name: str = Body(...),
+    namespace: str = Body(default="default")
+):
+    """Uninstall Helm release"""
+    return await helm_service.uninstall_helm_release(release_name, namespace)
+
+@app.get("/helm/releases")
+async def list_helm_releases(namespace: str = Query(default="default")):
+    """List Helm releases in namespace"""
+    return await helm_service.list_helm_releases(namespace)
+
+# ---------- Complete Azure Deployment Endpoints ----------
+
+@app.post("/azure/deploy-complete")
+async def deploy_complete_application(
+    # Terraform configuration
+    terraform_config: dict = Body(...),
+    repo_path: str = Body(...),
+    
+    # Container configuration
+    image_name: str = Body(...),
+    image_tag: str = Body(default="latest"),
+    app_port: int = Body(default=80),
+    
+    # Registry choice
+    registry_choice: str = Body(default="acr"),  # "acr" or "dockerhub"
+    docker_username: str = Body(default=None),  # Required for dockerhub
+    acr_name: str = Body(default=None),  # Optional, will be generated if not provided
+    
+    # Deployment configuration
+    app_name: str = Body(default=None),  # Will use image_name if not provided
+    namespace: str = Body(default="default"),
+    replica_count: int = Body(default=2)
+):
+    """
+    Complete Azure deployment workflow:
+    1. Apply Terraform (creates AKS + optionally ACR)
+    2. Push container to chosen registry (ACR or Docker Hub)
+    3. Create and deploy Helm chart to AKS
+    """
+    config = {
+        "terraform_config": terraform_config,
+        "repo_path": repo_path,
+        "image_name": image_name,
+        "image_tag": image_tag,
+        "app_port": app_port,
+        "registry_choice": registry_choice,
+        "docker_username": docker_username,
+        "acr_name": acr_name,
+        "app_name": app_name or image_name,
+        "namespace": namespace,
+        "replica_count": replica_count
+    }
+    
+    return await deployment_service.deploy_complete_application(config)
+
+@app.post("/azure/cleanup-deployment")
+async def cleanup_complete_deployment(
+    repo_path: str = Body(...),
+    app_name: str = Body(...),
+    namespace: str = Body(default="default"),
+    cleanup_helm: bool = Body(default=True),
+    cleanup_terraform: bool = Body(default=True)
+):
+    """Clean up complete deployment (Helm + Terraform)"""
+    config = {
+        "repo_path": repo_path,
+        "app_name": app_name,
+        "namespace": namespace,
+        "cleanup_helm": cleanup_helm,
+        "cleanup_terraform": cleanup_terraform
+    }
+    
+    return await deployment_service.cleanup_deployment(config)
+
+@app.get("/azure/registry-choice-guide")
+async def get_registry_choice_guide():
+    """Guide for choosing between ACR and Docker Hub"""
+    return {
+        "title": "Container Registry Choice Guide",
+        "options": {
+            "acr": {
+                "name": "Azure Container Registry (ACR)",
+                "advantages": [
+                    "Integrated with Azure and AKS",
+                    "Private registry in your Azure subscription", 
+                    "Automatic authentication with AKS",
+                    "Built-in security scanning",
+                    "Geo-replication support",
+                    "Azure RBAC integration"
+                ],
+                "disadvantages": [
+                    "Azure-specific (vendor lock-in)",
+                    "Additional cost for storage",
+                    "Requires Azure subscription"
+                ],
+                "best_for": [
+                    "Production Azure workloads",
+                    "Private enterprise applications",
+                    "Applications requiring tight Azure integration",
+                    "Teams already using Azure heavily"
+                ],
+                "cost": "Pay for storage and bandwidth usage"
+            },
+            "dockerhub": {
+                "name": "Docker Hub",
+                "advantages": [
+                    "Universal compatibility",
+                    "Large ecosystem and community",
+                    "Free tier available",
+                    "Well-known and established",
+                    "Easy to use and share publicly"
+                ],
+                "disadvantages": [
+                    "Public by default (private repos cost extra)",
+                    "Rate limiting on free tier",
+                    "Less integrated with Azure",
+                    "Requires separate authentication setup"
+                ],
+                "best_for": [
+                    "Open source projects",
+                    "Development and testing",
+                    "Multi-cloud deployments",
+                    "Cost-sensitive projects"
+                ],
+                "cost": "Free for public repos, paid for private repos"
+            }
+        },
+        "recommendation": {
+            "use_acr_when": [
+                "Deploying to Azure AKS in production",
+                "Need private registry with Azure integration",
+                "Security and compliance are priorities",
+                "Already have Azure subscription and budget"
+            ],
+            "use_dockerhub_when": [
+                "Building open source or public projects",
+                "Need multi-cloud compatibility", 
+                "Want to minimize Azure costs",
+                "In development/testing phase"
+            ]
+        },
+        "configuration_examples": {
+            "acr_deployment": {
+                "registry_choice": "acr",
+                "acr_name": "myappregistry",  # Optional, will be auto-generated
+                "docker_username": None  # Not needed for ACR
+            },
+            "dockerhub_deployment": {
+                "registry_choice": "dockerhub", 
+                "acr_name": None,  # Not needed for Docker Hub
+                "docker_username": "your_dockerhub_username"  # Required
+            }
+        }
+    }
 
 
 # ---------- MCP mount ----------

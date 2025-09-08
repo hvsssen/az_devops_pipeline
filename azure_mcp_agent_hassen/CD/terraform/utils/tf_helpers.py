@@ -1,6 +1,10 @@
 import re
+import logging
 from pathlib import Path
 from ..models.tf_models import TerraformConfig
+
+# Set up logging
+logging.basicConfig(level=logging.DEBUG)
 
 TEMPLATE = '''
 terraform {{
@@ -16,18 +20,16 @@ provider "azurerm" {{
   features {{}}
 }}
 
-resource "azurerm_resource_group" "rg" {{
-  name     = "RG-{cluster_name}-{user_id}"
-  location = "{region}"
-  tags     = {tags_json}
+data "azurerm_resource_group" "rg" {{
+  name = "{existing_resource_group}"
 }}
 
 {law_block}
 
 resource "azurerm_kubernetes_cluster" "aks" {{
   name                = "{cluster_name}"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
   dns_prefix          = "{dns_prefix}"
 
   default_node_pool {{
@@ -48,7 +50,7 @@ resource "azurerm_kubernetes_cluster" "aks" {{
 
   {monitoring_block}
 
-  tags = azurerm_resource_group.rg.tags
+  tags = data.azurerm_resource_group.rg.tags
 }}
 
 output "cluster_name" {{
@@ -56,7 +58,7 @@ output "cluster_name" {{
 }}
 
 output "resource_group" {{
-  value = azurerm_resource_group.rg.name
+  value = data.azurerm_resource_group.rg.name
 }}
 
 output "kubeconfig" {{
@@ -81,16 +83,43 @@ terraform {{
 '''
 
 def write_tf_file(path: str, config: TerraformConfig, use_remote_backend: bool = True):
+    """Write Terraform configuration files with comprehensive logging"""
+    logging.info(f"Starting Terraform file generation")
+    logging.info(f"Path: {path}")
+    logging.info(f"Config: {config}")
+    logging.info(f"Use remote backend: {use_remote_backend}")
+    
     path = Path(path)
 
     if path.is_dir():
         tf_dir = path
         main_tf_path = tf_dir / "main.tf"
+        logging.info(f"Using directory mode - TF dir: {tf_dir}, main.tf: {main_tf_path}")
     else:
         tf_dir = path.parent
         main_tf_path = path
+        logging.info(f"Using file mode - TF dir: {tf_dir}, main.tf: {main_tf_path}")
         
     tf_dir.mkdir(exist_ok=True)
+    logging.info(f"Created/ensured directory exists: {tf_dir}")
+    
+    # Check for existing files
+    existing_files = list(tf_dir.glob("*.tf"))
+    logging.info(f"Existing .tf files in directory: {existing_files}")
+    
+    # Remove existing backend.tf if we're not using remote backend
+    backend_tf_path = tf_dir / "backend.tf"
+    if not use_remote_backend and backend_tf_path.exists():
+        logging.info(f"Removing existing backend.tf file: {backend_tf_path}")
+        backend_tf_path.unlink()
+    elif backend_tf_path.exists():
+        logging.info(f"Existing backend.tf found: {backend_tf_path}")
+        try:
+            with open(backend_tf_path, 'r') as f:
+                backend_content = f.read()
+                logging.info(f"Existing backend.tf content:\n{backend_content}")
+        except Exception as e:
+            logging.warning(f"Could not read existing backend.tf: {e}")
 
     cleaned = re.sub(r'[^a-zA-Z0-9]', '', config.cluster_name)
     dns_prefix = cleaned[:10].lower()
@@ -115,10 +144,10 @@ def write_tf_file(path: str, config: TerraformConfig, use_remote_backend: bool =
     law_block = f'''
 resource "azurerm_log_analytics_workspace" "law" {{
   name                = "LAW-{config.cluster_name}"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
   retention_in_days   = 30
-  tags                = azurerm_resource_group.rg.tags
+  tags                = data.azurerm_resource_group.rg.tags
 }}
 ''' if config.enable_monitoring else ''
 
@@ -127,6 +156,9 @@ resource "azurerm_log_analytics_workspace" "law" {{
         tags_json = json.dumps(config.tags)
     except Exception:
         tags_json = str({k: str(v) for k, v in config.tags.items()}).replace("'", '"')
+
+    # Default to rg-mcp-devops if no existing resource group specified
+    existing_resource_group = getattr(config, 'existing_resource_group', 'rg-mcp-devops')
 
     main_content = TEMPLATE.format(
         cluster_name=config.cluster_name,
@@ -143,7 +175,8 @@ resource "azurerm_log_analytics_workspace" "law" {{
         oidc_block=oidc_block,
         monitoring_block=monitoring_block,
         law_block=law_block,
-        auto_scaling_block=auto_scaling_block
+        auto_scaling_block=auto_scaling_block,
+        existing_resource_group=existing_resource_group
     )
     print(f"Writing Terraform config to {main_tf_path}")
     with open(main_tf_path, 'w', encoding='utf-8') as f:

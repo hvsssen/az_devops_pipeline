@@ -107,3 +107,77 @@ class AzureMetric(BaseModel):
     value: float
     unit: str
     timestamp: str
+
+
+# ACR (Azure Container Registry) Models
+class ACRRepository(BaseModel):
+    """Model for Azure Container Registry repository"""
+    name: str
+    tag_count: int
+    manifest_count: int
+    last_update_time: Optional[str] = None
+
+
+class ACRInfo(BaseModel):
+    """Model for Azure Container Registry information"""
+    name: str
+    resource_group: str
+    login_server: str
+    sku: str
+    admin_enabled: bool
+    location: str
+    creation_date: Optional[str] = None
+
+
+class ACRCredentials(BaseModel):
+    """Model for ACR login credentials"""
+    username: str
+    password: str
+    password2: str
+    registry_url: str
+
+
+# Helm Models
+class HelmChart(BaseModel):
+    """Model for Helm chart information"""
+    name: str
+    version: str
+    app_version: str
+    description: str
+    chart_path: str
+
+
+class HelmRelease(BaseModel):
+    """Model for Helm release information"""
+    name: str
+    namespace: str
+    revision: int
+    updated: str
+    status: str
+    chart: str
+    app_version: str
+
+
+# Deployment Models
+class DeploymentConfig(BaseModel):
+    """Model for complete deployment configuration"""
+    terraform_config: Dict
+    repo_path: str
+    image_name: str
+    image_tag: str = "latest"
+    app_port: int = 80
+    registry_choice: str = "acr"  # "acr" or "dockerhub"
+    docker_username: Optional[str] = None
+    acr_name: Optional[str] = None
+    app_name: Optional[str] = None
+    namespace: str = "default"
+    replica_count: int = 2
+
+
+class DeploymentResult(BaseModel):
+    """Model for deployment result"""
+    status: str
+    steps: Dict
+    overall_success: bool
+    message: str
+    endpoints: Optional[List[Dict]] = None

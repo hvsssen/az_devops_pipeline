@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Azure MCP DevOps Agent - Complete Documentation</title>
+        <title>Azure MCP DevOps Agent - Complete GitHub, Docker, Terraform & Azure Automation</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css" rel="stylesheet">
     <link href="/static/style.css" rel="stylesheet">
@@ -28,9 +28,9 @@
             <div class="col-12">
                 <div class="jumbotron bg-primary text-white p-5 rounded">
                     <h1 class="display-4">Azure MCP DevOps Agent</h1>
-                    <p class="lead">A comprehensive Model Context Protocol (MCP) server with <strong>GitHub + Docker + Azure</strong> integration and Smart Port Detection.</p>
+                    <p class="lead">An AI-powered DevOps Agent with MCP interface: <strong>GitHub + Docker + Terraform + Azure</strong> integration with Smart Automation.</p>
                     <hr class="my-4">
-                    <p>🚀 Complete DevOps Pipeline: GitHub → Docker → Azure with intelligent automation!</p>
+                    <p>🚀 Complete DevOps Pipeline: GitHub → Docker → Terraform → Azure with intelligent automation!</p>
                 </div>
             </div>
         </div>
@@ -69,6 +69,19 @@
                     <div class="col-md-3">
                         <div class="card h-100">
                             <div class="card-body">
+                                <h5 class="card-title">🏗️ Terraform IaC</h5>
+                                <p class="card-text">
+                                    • Azure AKS clusters<br>
+                                    • Remote state backend<br>
+                                    • Auto-scaling config<br>
+                                    • OIDC integration
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card h-100">
+                            <div class="card-body">
                                 <h5 class="card-title">☁️ Azure Cloud</h5>
                                 <p class="card-text">
                                     • Azure CLI integration<br>
@@ -79,10 +92,25 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
                         <div class="card h-100">
                             <div class="card-body">
-                                <h5 class="card-title">🤖 MCP Protocol</h5>
+                                <h5 class="card-title">🤖 AI Agent Intelligence</h5>
+                                <p class="card-text">
+                                    • Intelligent automation<br>
+                                    • Context-aware decisions<br>
+                                    • Adaptive workflows<br>
+                                    • Smart error handling
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">🔌 MCP Protocol</h5>
                                 <p class="card-text">
                                     • Standard interface<br>
                                     • Claude integration<br>
@@ -101,7 +129,7 @@
             <div class="col-12">
                 <div class="alert alert-info">
                     <h4>🚀 Complete DevOps Workflow</h4>
-                    <p><strong>Your MCP server now provides end-to-end DevOps automation!</strong></p>
+                    <p><strong>Your AI-powered DevOps Agent provides end-to-end automation with intelligence!</strong></p>
                     <div class="row">
                         <div class="col-md-6">
                             <h6>📋 Development Flow:</h6>
@@ -109,6 +137,7 @@
                                 <li>🐙 <strong>GitHub:</strong> List, clone, manage repositories</li>
                                 <li>🔍 <strong>Smart Detection:</strong> Auto-detect ports and configurations</li>
                                 <li>🐳 <strong>Docker:</strong> Build, tag, and push images</li>
+                                <li>🏗️ <strong>Terraform:</strong> Generate and manage infrastructure</li>
                                 <li>☁️ <strong>Azure:</strong> Deploy to cloud infrastructure</li>
                             </ol>
                         </div>
@@ -119,6 +148,8 @@
                                 <li>🖥️ <strong>VM Management:</strong> Monitor virtual machines</li>
                                 <li>📈 <strong>Usage Reports:</strong> Analyze resource consumption</li>
                                 <li>🔧 <strong>Resource Groups:</strong> Organize cloud resources</li>
+                                <li>🏗️ <strong>Infrastructure:</strong> Terraform state management</li>
+                                <li>🤖 <strong>AI Intelligence:</strong> Context-aware automation</li>
                             </ul>
                         </div>
                     </div>
@@ -268,6 +299,57 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Terraform Endpoints -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="terraformHeading">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#terraformCollapse">
+                                🏗️ Terraform Infrastructure APIs
+                            </button>
+                        </h2>
+                        <div id="terraformCollapse" class="accordion-collapse collapse" data-bs-parent="#apiAccordion">
+                            <div class="accordion-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Method</th>
+                                                <th>Endpoint</th>
+                                                <th>Description</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><span class="badge bg-success">POST</span></td>
+                                                <td><code>/terraform/generate</code></td>
+                                                <td>🆕 Generate Terraform configuration for AKS</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="badge bg-primary">GET</span></td>
+                                                <td><code>/terraform/init</code></td>
+                                                <td>🆕 Initialize Terraform with Azure backend</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="badge bg-primary">GET</span></td>
+                                                <td><code>/terraform/plan</code></td>
+                                                <td>🆕 Show Terraform execution plan</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="badge bg-warning">GET</span></td>
+                                                <td><code>/terraform/apply</code></td>
+                                                <td>🆕 Apply Terraform changes to Azure</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="badge bg-danger">GET</span></td>
+                                                <td><code>/terraform/destroy</code></td>
+                                                <td>🆕 Destroy Terraform-managed resources</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -279,7 +361,7 @@
                 <div class="card">
                     <div class="card-body">
                         <h5>1. End-to-End Development & Deployment</h5>
-                        <pre class="language-python"><code># Complete workflow: GitHub → Docker → Azure
+                        <pre class="language-python"><code># Complete workflow: GitHub → Docker → Terraform → Azure
 # Step 1: GitHub Authentication & Repository Management
 github_login = github_login_mcp_github_login_get()
 repos = get_repositories_github_repos_get()
@@ -299,14 +381,74 @@ azure_login = azure_login()
 subscriptions = azure_subscriptions()
 vm_usage = azure_vm_usage()
 
-# Step 4: Run with Auto-Detection
+# Step 4: Terraform Infrastructure as Code
+terraform_config = {
+    "user_id": "hassen123",
+    "cluster_name": "my-aks-cluster",
+    "region": "eastus",
+    "node_count": 3,
+    "vm_size": "Standard_DS2_v2",
+    "auto_scaling": True,
+    "min_nodes": 1,
+    "max_nodes": 5,
+    "enable_monitoring": True,
+    "private_cluster": False,
+    "dns_domain": "myapp.local",
+    "enable_oidc": True,
+    "tags": {"environment": "production", "project": "webapp"}
+}
+
+terraform_generate = terraform_generate_main_tf(config=terraform_config, repo_path="repos/webapp")
+terraform_init = terraform_init(repo_path="repos/webapp")
+terraform_plan = terraform_plan(repo_path="repos/webapp")
+
+# Step 5: Run with Auto-Detection
 container_result = run_docker_container(
     image="webapp",
     tag="latest", 
     repo_path="repos/webapp"
 )</code></pre>
 
-                        <h5 class="mt-4">2. Azure Cloud Operations</h5>
+                        <h5 class="mt-4">2. Infrastructure as Code with Terraform</h5>
+                        <pre class="language-python"><code># Generate and manage Azure infrastructure with Terraform
+# Step 1: Generate Terraform configuration
+config = {
+    "user_id": "unique_user_id",
+    "cluster_name": "production-aks",
+    "region": "eastus2",
+    "node_count": 3,
+    "vm_size": "Standard_DS3_v2",
+    "auto_scaling": True,
+    "min_nodes": 2,
+    "max_nodes": 10,
+    "enable_monitoring": True,
+    "private_cluster": True,
+    "dns_domain": "internal.company.com",
+    "enable_oidc": True,
+    "tags": {
+        "environment": "production",
+        "project": "webapp",
+        "owner": "devops-team"
+    }
+}
+
+# Generate Terraform files with Azure backend
+terraform_result = terraform_generate_main_tf(
+    config=config,
+    repo_path="path/to/project",
+    use_remote_backend=True
+)
+
+# Initialize Terraform (connects to Azure storage backend)
+init_result = terraform_init(repo_path="path/to/project")
+
+# Plan infrastructure changes
+plan_result = terraform_plan(repo_path="path/to/project")
+
+# Apply changes (creates AKS cluster with all configurations)
+apply_result = terraform_apply(repo_path="path/to/project")</code></pre>
+
+                        <h5 class="mt-4">3. Azure Cloud Operations</h5>
                         <pre class="language-python"><code># Azure resource management and monitoring
 # Authentication
 azure_login_response = azure_login()
@@ -325,7 +467,7 @@ vm_details = azure_vm_details(
 # Execute custom Azure CLI commands
 command_result = azure_command_async(command="vm list --output table")</code></pre>
 
-                        <h5 class="mt-4">3. Cost Monitoring & Analysis</h5>
+                        <h5 class="mt-4">4. Cost Monitoring & Analysis</h5>
                         <pre class="language-bash"><code># Get Azure cost and usage data
 curl "http://localhost:8000/azure/vms"
 
@@ -353,6 +495,7 @@ curl "http://localhost:8000/azure/vms"
                             <li>Python 3.8+</li>
                             <li>Docker installed and running</li>
                             <li>Azure CLI installed</li>
+                            <li>Terraform CLI installed</li>
                             <li>Git</li>
                             <li>Docker Hub account</li>
                             <li>Azure subscription</li>
@@ -366,10 +509,16 @@ cd az_devops_pipeline/azure_mcp_agent_hassen
 # 2. Install Python dependencies
 pip install fastapi uvicorn python-dotenv httpx gitpython fastapi-mcp
 
-# 3. Install Azure CLI (if not installed)
+# 3. Install Azure CLI and Terraform (if not installed)
+# Azure CLI:
 # Windows: https://aka.ms/installazurecliwindows
 # macOS: brew install azure-cli
 # Linux: curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+# Terraform:
+# Windows: choco install terraform
+# macOS: brew install terraform
+# Linux: https://learn.hashicorp.com/tutorials/terraform/install-cli
 
 # 4. Configure environment
 echo "DOCKER_USERNAME=your_username" > .env
@@ -380,17 +529,18 @@ python server.py
 
 # 6. Access documentation at http://localhost:8000</code></pre>
 
-                        <h5 class="mt-4">🆕 What's New in This Conversion</h5>
+                        <h5 class="mt-4">🆕 Latest AI Agent Features</h5>
                         <div class="alert alert-success">
-                            <h6>✅ Converted from standalone MCP to integrated utilities:</h6>
+                            <h6>✅ Evolved from MCP Server to AI-powered DevOps Agent:</h6>
                             <ul class="mb-0">
-                                <li><strong>Modular Design:</strong> Azure functions are now utility methods in <code>azure_utils.py</code></li>
-                                <li><strong>REST API Integration:</strong> Azure endpoints added to main FastAPI server</li>
-                                <li><strong>Pydantic Models:</strong> Type-safe request/response models for Azure operations</li>
-                                <li><strong>Unified Interface:</strong> GitHub + Docker + Azure in one MCP server</li>
-                                <li><strong>Session Management:</strong> Azure authentication persisted across requests</li>
-                                <li><strong>Error Handling:</strong> Comprehensive error handling and logging</li>
-                                <li><strong>Async Support:</strong> Asynchronous Azure CLI command execution</li>
+                                <li><strong>AI Intelligence:</strong> Context-aware automation and decision making</li>
+                                <li><strong>Terraform Integration:</strong> Complete Infrastructure as Code with Azure backend</li>
+                                <li><strong>Smart State Management:</strong> Automated Azure storage account for Terraform state</li>
+                                <li><strong>Unified Interface:</strong> GitHub + Docker + Terraform + Azure in one system</li>
+                                <li><strong>Azure Authentication:</strong> Seamless integration with Azure CLI</li>
+                                <li><strong>MCP Protocol:</strong> Standardized interface for AI model integration</li>
+                                <li><strong>Auto-scaling AKS:</strong> Kubernetes clusters with OIDC and monitoring</li>
+                                <li><strong>End-to-End Automation:</strong> From code to cloud infrastructure</li>
                             </ul>
                         </div>
                     </div>
@@ -404,8 +554,8 @@ python server.py
             <div class="row">
                 <div class="col-md-8">
                     <h5>☁️ Azure MCP DevOps Agent</h5>
-                    <p>Complete DevOps automation: GitHub + Docker + Azure</p>
-                    <p class="text-muted">Built with FastAPI • Smart Port Detection • Azure Integration • Model Context Protocol</p>
+                    <p>AI-powered DevOps automation: GitHub + Docker + Terraform + Azure</p>
+                    <p class="text-muted">Built with FastAPI • Infrastructure as Code • AI Intelligence • Model Context Protocol</p>
                 </div>
                 <div class="col-md-4 text-end">
                     <p>
